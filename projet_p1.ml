@@ -101,18 +101,18 @@ let rec difference (ens1: 'a multiensemble) (ens2: 'a multiensemble) : 'a multie
 (* Q10: *)
 
 let un_dans (ens: 'a multiensemble) : nat =
-  let rec ieme (ens: 'a multiensemble) (index : int) (random : int)=
+  let rec ieme (ens: 'a multiensemble) (index : int)=
     match ens with
       | A((elem,occurence),tail) ->
-          if index = random
+          if index = 0
           then elem
           else if occurence = 1
-               then ieme (tail) (index+1) (random)
-               else ieme (A((elem,occurence-1),tail)) (index+1) (random)
-      | V -> failwith "ensemble vide" (* case that will never happen,
+               then ieme (tail) (random - 1)
+               else ieme (A((elem,occurence-1),tail)) (index-1)
+      | _ -> failwith "ensemble vide" (* case that will never happen,
                                       just avoiding the non exhaustive matching*)
-    and  ( random : int ) = Random.int(cardinal ens)
-  in ieme (ens) (0) (random);;
+    and  ( random : int ) = min (Random.int(cardinal ens)) (cardinal ens -1)
+  in ieme (ens) (random);;
 
 
 
