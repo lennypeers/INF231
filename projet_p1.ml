@@ -107,7 +107,7 @@ let un_dans (ens: 'a multiensemble) : nat =
           if index = 0
           then elem
           else if occurence = 1
-               then ieme (tail) (random - 1)
+               then ieme (tail) (index - 1)
                else ieme (A((elem,occurence-1),tail)) (index-1)
       | _ -> failwith "ensemble vide" (* case that will never happen,
                                       just avoiding the non exhaustive matching*)
