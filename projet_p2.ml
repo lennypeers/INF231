@@ -103,7 +103,7 @@ let un_dans (ens: 'a multiensemble) : nat =
                else ieme ((elem,occurence-1)::tail) (index-1)
       | _ -> failwith "ensemble vide" (* case that will never happen, just avoiding
                                         the error message of the interpretor *)
-    and  ( random : int ) = min (Random.int(cardinal ens)) (cardinal ens -1)
+    and  ( random : int ) = Random.int(cardinal ens)
   in ieme (ens) (random);;
 
 (* Q3: Reusinage avec l'ordre superieur *)
