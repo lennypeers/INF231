@@ -29,7 +29,7 @@ let rec nbocc (elt : 'a) (ens : 'a multiensemble) : int =
 let rec appartient (elt : 'a) (ens : 'a multiensemble) : bool =
   match ens with
   | [] -> false
-  | (elt2,n)::tail -> (elt2 = elt && n <> 0) || (appartient elt tail) ;; (*nat peut etre egal a zero*)
+  | (elt2,n)::tail -> (elt2 = elt && n <> 0) || (appartient elt tail) ;; (*n peut etre egal a zero*)
 
 (* 4 *)
 
