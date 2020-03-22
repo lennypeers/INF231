@@ -71,12 +71,12 @@ type etat = ( statut * statut ) * table * pioche * joueur ;;
 
 
 (* 6.5.1 Etat initial *)
+
 let rec extraire(n:int)(p:pioche):main=
   match n with
-    0->[]
-  |_->
-      let elem =(un_dans p) in
-      en_ordre((ajoute (elem,1) (extraire (n-1) (supprime (elem,1) p))));;
+  | 0 -> []
+  | _ -> let elem =(un_dans p) in
+         en_ordre((ajoute (elem,1) (extraire (n-1) (supprime (elem,1) p)))) ;;
 
 
 
