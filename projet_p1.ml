@@ -100,7 +100,7 @@ let rec difference (ens1: 'a multiensemble) (ens2: 'a multiensemble) : 'a multie
 
 (* Q10: *)
 
-let un_dans (ens: 'a multiensemble) : nat =
+let un_dans (ens: 'a multiensemble) : 'a =
   let rec ieme (ens: 'a multiensemble) (index : int)=
     match ens with
       | A((elem,occurence),tail) ->
