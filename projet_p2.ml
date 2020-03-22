@@ -86,10 +86,8 @@ let rec difference (ens1: 'a multiensemble) (ens2: 'a multiensemble) : 'a multie
   | (elt,occ)::tail ->
       if occ <> 0 && not (appartient elt ens2)
       then ajoute (elt,occ) (difference tail ens2)
-      else match (supprime (elt,nbocc elt ens2) [(elt,occ)]) with
-             | [x] -> x::difference tail ens2 
-             | _ -> failwith "error" ;; (* case that will never happen, just avoiding
-                                        the error message of the interpretor *)
+      else (supprime (elt,nbocc elt ens2) [(elt,occ)]) @ difference tail ens2 ;;
+
 (* 10 *)
 
 let un_dans (ens: 'a multiensemble) : 'a =
@@ -103,7 +101,7 @@ let un_dans (ens: 'a multiensemble) : 'a =
                else ieme ((elem,occurence-1)::tail) (index-1)
       | _ -> failwith "ensemble vide" (* case that will never happen, just avoiding
                                         the error message of the interpretor *)
-    and  ( random : int ) = Random.int(cardinal ens)
+  in let ( random : int ) = Random.int(cardinal ens)
   in ieme (ens) (random);;
 
 (* Q3: Reusinage avec l'ordre superieur *)
