@@ -109,6 +109,39 @@ let init_partie () : etat =
   (((J1,false,main1),(J2,false,main2)),[],pioche,J1) ;;
 
 
+(* 6.5.2 Accès aux informations d'un état *)
+
+(* 1 *)
+
+let joueur_courant (etat:etat) : joueur = 
+    let (_,_,_,joueur) = etat in joueur ;;
+
+let joueur_suivant (etat:etat) : joueur =
+    let (_,_,_,joueur) = etat in if joueur = J1 then J2 else J1 ;;
+    
+(* 2 *)
+
+let la_table (etat:etat) : table =
+    let (_,table,_,_) = etat in table ;;
+
+(* 3 *)
+
+let la_pioche (etat:etat) : pioche = 
+    let (_,_,pioche,_) = etat in pioche ;;
+
+(* 4 *)
+
+let le_statut (joueur:joueur) (etat:etat) : statut = 
+    let ((j1,j2),_,_,_) = etat in if joueur = J1 then j1 else j2 ;;
+
+(* 5 *)
+
+let la_main (joueur:joueur) (etat:etat) : main = 
+    let (_,_,main) = le_statut joueur etat in main ;;
+
+
+
+
 
 
 
