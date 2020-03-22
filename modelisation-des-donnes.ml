@@ -86,25 +86,27 @@ type statut = joueur * bool * main ;;
 type etat = ( statut * statut ) * table * pioche * joueur ;;
 
 
-
 (* 6.5.1 Etat initial *)
 
 (* Q8 *)
 
-let rec extraire (n:int) (p:pioche) : main =
-  match n with
-  | 0 -> []
-  | _ -> let elem = un_dans p in
-         en_ordre ((ajoute (elem,1) (extraire (n-1) (supprime (elem,1) p)))) ;;
+let extraire (n:int) (p:pioche) : main * pioche =
+    let rec extraction (n:int) (p:pioche) (temp:main) =
+        if n = 0
+        then en_ordre temp, en_ordre p
+        else let elem = un_dans p in extraction (n-1) (supprime (elem,1) p) (ajoute (elem,1) temp) in
+    extraction n p [] ;;
 
 
-let distrib = fun unit -> 5 ;;
+let distrib () : main * main * pioche =
+  let (main1,pioche1) = extraire 14 cst_PIOCHE_INIT in 
+  let (main2,pioche2)= extraire 14 pioche1 in 
+  (main1,main2,pioche2) ;;
 
 
-
-
-
-
+let init_partie () : etat =
+  let (main1,main2,pioche) = distrib () in
+  (((J1,false,main1),(J2,false,main2)),[],pioche,J1) ;;
 
 
 
