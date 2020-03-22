@@ -47,7 +47,7 @@ let cst_PIOCHE_INIT : pioche =
    (T (12, Jaune), 2); (T (13, Jaune), 2); (T (1, Noir), 2); (T (2, Noir), 2);
    (T (3, Noir), 2); (T (4, Noir), 2); (T (5, Noir), 2); (T (6, Noir), 2);
    (T (7, Noir), 2); (T (8, Noir), 2); (T (9, Noir), 2); (T (10, Noir), 2);
-   (T (11, Noir), 2); (T (12, Noir), 2); (T (13, Noir), 2); (Joker,2)]
+   (T (11, Noir), 2); (T (12, Noir), 2); (T (13, Noir), 2); (Joker,2)] ;;
 
 
 (* Q7 *)
