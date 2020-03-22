@@ -92,7 +92,7 @@ let rec difference (ens1: 'a multiensemble) (ens2: 'a multiensemble) : 'a multie
                                         the error message of the interpretor *)
 (* 10 *)
 
-let un_dans (ens: 'a multiensemble) : nat =
+let un_dans (ens: 'a multiensemble) : 'a =
   let rec ieme (ens: 'a multiensemble) (index : int) =
     match ens with
       | (elem,occurence)::tail ->
