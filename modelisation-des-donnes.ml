@@ -134,7 +134,9 @@ let la_pioche (etat:etat) : pioche =
 (* 4 *)
 
 let le_statut (joueur:joueur) (etat:etat) : statut = 
-    let ((j1,j2),_,_,_) = etat in if joueur = J1 then j1 else j2 ;;
+    let ((j1,j2),_,_,_) = etat in if joueur = J1 
+                                  then j1 
+                                  else j2 ;;
 
 (* 5 *)
 
