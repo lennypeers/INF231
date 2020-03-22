@@ -117,7 +117,9 @@ let joueur_courant (etat:etat) : joueur =
     let (_,_,_,joueur) = etat in joueur ;;
 
 let joueur_suivant (etat:etat) : joueur =
-    let (_,_,_,joueur) = etat in if joueur = J1 then J2 else J1 ;;
+    let courant = joueur_courant etat in if courant = J1 
+                                         then J2
+                                         else J1 ;;
     
 (* 2 *)
 
