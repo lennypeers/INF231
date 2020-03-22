@@ -57,6 +57,17 @@ let en_ordre (ens:tuile multiensemble) : tuile multiensemble =
     in ordonne ens [] ;;
 
 
+(* 6.4 Les joueurs *)
+
+type joueur = J1 | J2 ;;
+
+type statut = joueur * bool * main ;;
+
+
+(* 6.5 Etat d'une partie *)
+
+type etat = ( statut * statut ) * table * pioche * joueur ;;
+
 
 
 
