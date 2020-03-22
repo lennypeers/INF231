@@ -32,6 +32,23 @@ type main = tuile multiensemble ;;
 
 type pioche = tuile multiensemble ;;
 
+let cst_PIOCHE_INIT : pioche = 
+
+  [(T (1, Bleu), 2); (T (2, Bleu), 2); (T (3, Bleu), 2); (T (4, Bleu), 2);
+   (T (5, Bleu), 2); (T (6, Bleu), 2); (T (7, Bleu), 2); (T (8, Bleu), 2);
+   (T (9, Bleu), 2); (T (10, Bleu), 2); (T (11, Bleu), 2); (T (12, Bleu), 2);
+   (T (13, Bleu), 2); (T (1, Rouge), 2); (T (2, Rouge), 2); (T (3, Rouge), 2);
+   (T (4, Rouge), 2); (T (5, Rouge), 2); (T (6, Rouge), 2); (T (7, Rouge), 2);
+   (T (8, Rouge), 2); (T (9, Rouge), 2); (T (10, Rouge), 2);
+   (T (11, Rouge), 2); (T (12, Rouge), 2); (T (13, Rouge), 2);
+   (T (1, Jaune), 2); (T (2, Jaune), 2); (T (3, Jaune), 2); (T (4, Jaune), 2);
+   (T (5, Jaune), 2); (T (6, Jaune), 2); (T (7, Jaune), 2); (T (8, Jaune), 2);
+   (T (9, Jaune), 2); (T (10, Jaune), 2); (T (11, Jaune), 2);
+   (T (12, Jaune), 2); (T (13, Jaune), 2); (T (1, Noir), 2); (T (2, Noir), 2);
+   (T (3, Noir), 2); (T (4, Noir), 2); (T (5, Noir), 2); (T (6, Noir), 2);
+   (T (7, Noir), 2); (T (8, Noir), 2); (T (9, Noir), 2); (T (10, Noir), 2);
+   (T (11, Noir), 2); (T (12, Noir), 2); (T (13, Noir), 2); (Joker,2)]
+
 
 (* Q7 *)
 
@@ -72,14 +89,16 @@ type etat = ( statut * statut ) * table * pioche * joueur ;;
 
 (* 6.5.1 Etat initial *)
 
-let rec extraire(n:int)(p:pioche):main=
+(* Q8 *)
+
+let rec extraire (n:int) (p:pioche) : main =
   match n with
   | 0 -> []
-  | _ -> let elem =(un_dans p) in
-         en_ordre((ajoute (elem,1) (extraire (n-1) (supprime (elem,1) p)))) ;;
+  | _ -> let elem = un_dans p in
+         en_ordre ((ajoute (elem,1) (extraire (n-1) (supprime (elem,1) p)))) ;;
 
 
-
+let distrib = fun unit -> 5 ;;
 
 
 
