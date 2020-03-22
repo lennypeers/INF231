@@ -4,8 +4,7 @@
 
 type nat = int (* >= 0 *) ;;
 type 'a multielement = 'a * nat ;;
-
-type 'a multiensemble = 'a multielement list
+type 'a multiensemble = 'a multielement list ;;
 
 (* 1 *)
 
