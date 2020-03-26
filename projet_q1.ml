@@ -115,6 +115,43 @@ let un_dans (ens: 'a multiensemble) : 'a =
   in ieme (ens) (random);;
 
 
+(* Tests *)
+
+let ens = A(('a',3), A(('b',2), A(('c',1), V ))) ;;
+let ens1 = A(('a',3), A(('b',2), V )) ;;
+let ens2 = A(('a',3), A(('b',1), A(('c',2), V ))) ;;
+
+(* cardinal *)
+assert (cardinal ens = 6) ;;
+
+(* occurences *)
+assert (nbocc 'a' ens = 3) ;;
+
+(* appartenance *)
+assert (appartient 'a' ens = true ) ;;
+
+(* inclusion *)
+assert (inclus (A(('a',3),V)) ens = true) ;;
+assert ((inclus ens ens1) = false) ;;
+
+(* ajout *)
+assert ((ajoute (('c',1)) ens1) = ens) ;;
+
+(* suppression *)
+assert ((supprime(('c',1)) ens) = ens1) ;;
+
+(* egalite *)
+assert ((egaux ens ens1) =false) ;;
+
+(* intersection *)
+assert ((intersection ens ens2) = A(('a',3), A(('b',1), A(('c',1), V )))) ;;
+
+(* difference *)
+assert ((difference ens ens2) =A(('b',1),V)) ;;
+
+(* element aleatoire *)
+assert (let x= un_dans ens in (appartient x ens)=true) ;;
+
 
 
 
