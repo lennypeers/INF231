@@ -73,7 +73,7 @@ let rec intersection (ens1: 'a multiensemble) (ens2: 'a multiensemble) : 'a mult
   match ens1 with
   | [] -> []
   | (x,n)::tail ->
-      if x <> 0 && appartient x ens2
+      if n <> 0 && appartient x en2
       then (x,min(n)(nbocc x ens2))::intersection tail ens2
       else intersection tail ens2 ;;
 
