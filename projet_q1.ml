@@ -1,5 +1,8 @@
 (*
-231 PROJET
+ * INF231 
+ * 
+ * Thien Dat Phan
+ * Ny Aina Pedersen
  *)
 
 
@@ -92,7 +95,7 @@ let rec difference (ens1: 'a multiensemble) (ens2: 'a multiensemble) : 'a multie
   | V -> V
   | A((elt,occ), tail) ->
       if occ <> 0 && not (appartient elt ens2)
-      then ajoute (elt,occ) (difference tail ens2)
+      then A((elt,occ), (difference tail ens2))
       else ajoute (elt,max 0 (occ- nbocc elt ens2)) (difference tail ens2);;
 
 (* Q10: *)
@@ -101,11 +104,9 @@ let un_dans (ens: 'a multiensemble) : 'a =
   let rec ieme (ens: 'a multiensemble) (index : int)=
     match ens with
       | A((elem,occurence),tail) ->
-          if index = 0
+          if index < occurence 
           then elem
-          else if occurence = 1
-               then ieme (tail) (index - 1)
-               else ieme (A((elem,occurence-1), tail)) (index-1)
+          else ieme tail (index - occurence)
       | _ -> failwith "ensemble vide" (* case that will never happen,
                                       just avoiding the non exhaustive matching*)
   in let ( random : int ) = Random.int(cardinal ens)
@@ -115,55 +116,57 @@ in ieme (ens) (random);;
 (* Tests *)
 
 (* cardinal *)
-assert(cardinal ( A(('a',3), A(('b',2), A(('c',1), V )))) = 6) ;;
-assert(cardinal V = 0) ;;
+assert (cardinal ( A(('a',3), A(('b',2), A(('c',1), V )))) = 6) ;;
+assert (cardinal V = 0) ;;
 
 (* occurences *)
-assert(nbocc 'c' ( A(('a',3), A(('b',2), A(('c',1), V )))) = 1) ;;
-assert(nbocc 'a' ( A(('a',3), A(('b',2), A(('c',1), V )))) = 3) ;;
-assert(nbocc 'b' V = 0) ;;
+assert (nbocc 'c' ( A(('a',3), A(('b',2), A(('c',1), V )))) = 1) ;;
+assert (nbocc 'a' ( A(('a',3), A(('b',2), A(('c',1), V )))) = 3) ;;
+assert (nbocc 'b' V = 0) ;;
 
 (* appartenance *)
-assert(appartient 'c' ( A(('a',3), A(('b',2), A(('c',1), V )))) = true) ;;
-assert(appartient 'z' ( A(('a',3), A(('b',2), A(('c',1), V )))) = false) ;;
-assert(appartient 'a' V = false) ;;
+assert (appartient 'c' ( A(('a',3), A(('b',2), A(('c',1), V )))) = true) ;;
+assert (appartient 'z' ( A(('a',3), A(('b',2), A(('c',1), V )))) = false) ;;
+assert (appartient 'a' V = false) ;;
 
 (* inclusion *)
-assert(inclus ( A(('a',3), V )) ( A(('a',3), V )) = true) ;;
-assert(inclus ( A(('a',3), V )) ( A(('a',1), V )) = false) ;;
-assert(inclus ( A(('a',3), V )) ( A(('a',3), A(('b',4), V ))) = true) ;;
-assert(inclus V  ( A(('a',3), V )) = true) ;;
-assert(inclus ( A(('a',3), V ))  V = false) ;;
+assert (inclus ( A(('a',3), V )) ( A(('a',3), V )) = true) ;;
+assert (inclus ( A(('a',3), V )) ( A(('a',1), V )) = false) ;;
+assert (inclus ( A(('a',3), V )) ( A(('a',3), A(('b',4), V ))) = true) ;;
+assert (inclus V  ( A(('a',3), V )) = true) ;;
+assert (inclus ( A(('a',3), V ))  V = false) ;;
 
 let ens = A(('a',3), A(('b',2), A(('c',1), V ))) ;;
 let ens1 = A(('a',3), A(('b',2), V )) ;;
 let ens2 = A(('a',3), A(('b',1), A(('c',2), V ))) ;;
 
 (* ajout *)
-assert(ajoute ('c',1) ens1 = ens ) ;;
-assert(ajoute ('c',1) V = A(('c',1), V )) ;;
+assert (ajoute ('c',0) ens = ens) ;;
+assert (ajoute ('c',1) ens1 = ens) ;;
+assert (ajoute ('c',1) V = A(('c',1), V )) ;;
 
 (* suppression *)
-assert(supprime ('c',1) V = V) ;;
-assert(supprime ('c',1) ens = ens1) ;;
-assert(supprime ('c',1) (A(('c',1), V)) = V) ;;
+assert (supprime ('c',1) V = V) ;;
+assert (supprime ('c',0) ens = ens) ;;
+assert (supprime ('c',1) ens = ens1) ;;
+assert (supprime ('c',1) (A(('c',1), V)) = V) ;;
 
 (* egalite *)
-assert(egaux ens ens1 = false) ;;
-assert(egaux ens ens = true) ;;
-assert(egaux V ens = false) ;;
+assert (egaux ens ens1 = false) ;;
+assert (egaux ens ens = true) ;;
+assert (egaux V ens = false) ;;
 
 (* intersection *)
-assert(intersection ens ens2 = A(('a',3), A(('b',1), A(('c',1), V )))) ;;
-assert(intersection (A((1,3), V)) (A((1,1), V)) = A((1,1), V)) ;;
-assert(intersection V V = V) ;;
+assert (intersection ens ens2 = A(('a',3), A(('b',1), A(('c',1), V )))) ;;
+assert (intersection (A((1,3), V)) (A((1,1), V)) = A((1,1), V)) ;;
+assert (intersection V V = V) ;;
 
 (* difference *)
-assert((difference ens ens2) = A(('b',1), V)) ;;
-assert(difference (A((5,2), A((3,3), V))) (A((5,2), A((3,1), V))) = A((3,2), V)) ;;
+assert ((difference ens ens2) = A(('b',1), V)) ;;
+assert (difference (A((5,2), A((3,3), V))) (A((5,2), A((3,1), V))) = A((3,2), V)) ;;
 
 (* element aleatoire *)
-assert(let x = un_dans ens in (appartient x ens) = true) ;;
+assert (let x = un_dans ens in (appartient x ens) = true) ;;
 
 
 
