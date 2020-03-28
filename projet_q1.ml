@@ -2,7 +2,7 @@
  * INF231 
  * 
  * Thien Dat Phan
- * Ny Aina Pedersen
+ * Pedersen Ny Aina
  *)
 
 
