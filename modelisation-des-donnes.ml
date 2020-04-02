@@ -144,7 +144,26 @@ let la_main (joueur:joueur) (etat:etat) : main =
     let (_,_,main) = le_statut joueur etat in main ;;
 
 
+(* Q10 *)
 
+let rec remove_first_joker (li : tuile list) : int * tuile list = (* return nb of joker that has been removed and new list *)
+    match li with
+    | [] -> 0,[]
+    | T(n,c)::tail -> 0,T(n,c)::tail
+    | Joker::tail -> let n,l = remove_first_joker tail in (n + 1, l);;
+
+let f_suite (nombre_joker,valeur,couleur,statut : int*valeur*couleur*bool) (tuile : tuile)= 
+    match tuile with
+    | Joker -> ( nombre_joker, valeur +1, couleur, statut && ( valeur < 14 ) )
+    | T(valeur2,couleur2) -> 
+            (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 < 14 )) ;;
+
+let est_suite (comb: combinaison) : bool = 
+    List.length comb > 2 && 
+    let n,liste_simplifiee = remove_first_joker comb in 
+    let T(valeur,couleur) = (List.hd liste_simplifiee) in 
+    let _,_,_,statut = List.fold_left f_suite (n,valeur - 1,couleur,true) liste_simplifiee 
+    in statut ;;
 
 
 
