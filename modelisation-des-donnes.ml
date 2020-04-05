@@ -148,7 +148,7 @@ let la_main (joueur:joueur) (etat:etat) : main =
 
 (* to do: comments *)
 
-(* function that return the number of Jokers in the head of the list
+(* function that returns the number of Jokers in the head of the list
  * and a new list without these Jokers in the head. *)
 
 let rec remove_first_joker (li : tuile list) : int * tuile list = 
@@ -159,7 +159,9 @@ let rec remove_first_joker (li : tuile list) : int * tuile list =
 
 (* fonction est_suite *)
 
-(* an intermediate function that compare a tuile to the value in the accumulator *)
+(* An intermediate function that compares a tuile to the value in the accumulator:
+ * the accumulator is a tupple containing the number of jokers, the previous value, the color of the 
+ * sequence and the status of the current sequence (is it a suite or not ?) *)
 
 let f_suite (nombre_joker,valeur,couleur,statut : int * valeur * couleur * bool) (tuile : tuile) : int * valeur * couleur * bool = 
     match tuile with
