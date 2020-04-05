@@ -146,9 +146,12 @@ let la_main (joueur:joueur) (etat:etat) : main =
 
 (* Q10 *)
 
-(* to do: comments and non exhaustive match *)
+(* to do: comments *)
 
-let rec remove_first_joker (li : tuile list) : int * tuile list = (* return nb of joker that has been removed and new list *)
+(* function that return the number of Jokers in the head of the list
+ * and a new list without these Jokers in the head. *)
+
+let rec remove_first_joker (li : tuile list) : int * tuile list = 
     match li with
     | [] -> 0,[]
     | T(n,c)::tail -> 0,T(n,c)::tail
@@ -156,9 +159,12 @@ let rec remove_first_joker (li : tuile list) : int * tuile list = (* return nb o
 
 (* fonction est_suite *)
 
-let f_suite (nombre_joker,valeur,couleur,statut : int*valeur*couleur*bool) (tuile : tuile)= 
+(* an intermediate function that compare a tuile to the value in the accumulator *)
+
+let f_suite (nombre_joker,valeur,couleur,statut : int * valeur * couleur * bool) (tuile : tuile) : int * valeur * couleur * bool = 
     match tuile with
-    | Joker -> ( nombre_joker, valeur +1, couleur, statut && ( valeur < 14 ) )
+    | Joker -> 
+        ( nombre_joker, valeur +1, couleur, statut && ( valeur < 14 ) )
     | T(valeur2,couleur2) -> 
             (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 < 14 )) ;;
 
@@ -173,7 +179,7 @@ let est_suite (comb: combinaison) : bool =
 
 (* fonction est_groupe *)
 
-let f_groupe (coul_list,num,statut : couleur multiensemble *int* bool) (tuile : tuile) : couleur multiensemble * int * bool =
+let f_groupe (coul_list,num,statut : couleur multiensemble * int * bool) (tuile : tuile) : couleur multiensemble * int * bool =
     match tuile with 
     | Joker -> (coul_list, num, statut)
     | T(valeur,couleur) -> ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur == num)) ;;
