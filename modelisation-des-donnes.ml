@@ -154,6 +154,8 @@ let rec remove_first_joker (li : tuile list) : int * tuile list = (* return nb o
     | T(n,c)::tail -> 0,T(n,c)::tail
     | Joker::tail -> let n,l = remove_first_joker tail in (n + 1, l);;
 
+(* fonction est_suite *)
+
 let f_suite (nombre_joker,valeur,couleur,statut : int*valeur*couleur*bool) (tuile : tuile)= 
     match tuile with
     | Joker -> ( nombre_joker, valeur +1, couleur, statut && ( valeur < 14 ) )
@@ -163,9 +165,13 @@ let f_suite (nombre_joker,valeur,couleur,statut : int*valeur*couleur*bool) (tuil
 let est_suite (comb: combinaison) : bool = 
     List.length comb > 2 && 
     let n,liste_simplifiee = remove_first_joker comb in 
-    let T(valeur,couleur) = (List.hd liste_simplifiee) in 
+    match List.hd liste_simplifiee with 
+        | Joker -> failwith "case that will never happen" 
+        | T(valeur,couleur) ->
     let _,_,_,statut = List.fold_left f_suite (n,valeur - 1,couleur,true) liste_simplifiee 
     in statut ;;
+
+(* fonction est_groupe *)
 
 let f_groupe (coul_list,num,statut : couleur multiensemble *int* bool) (tuile : tuile) : couleur multiensemble * int * bool =
     match tuile with 
@@ -175,9 +181,13 @@ let f_groupe (coul_list,num,statut : couleur multiensemble *int* bool) (tuile : 
 let est_groupe (comb: combinaison) : bool =
     (List.length comb = 3 || List.length comb = 4) &&
     let _,list_simplifiee = remove_first_joker comb in
-    let T(valeur,_) = (List.hd list_simplifiee) in
+    match List.hd list_simplifiee with
+        | Joker -> failwith "case that will never happen"
+        | T(valeur,_) ->
     let _,_,statut = List.fold_left f_groupe ([], valeur, true) list_simplifiee 
     in statut ;;
+
+(* fonction de verification des combinaisons *)
 
 let combinaison_valide (comb: combinaison) : bool =
     est_suite comb || est_groupe comb ;;
