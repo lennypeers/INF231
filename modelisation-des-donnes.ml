@@ -180,8 +180,8 @@ let est_suite (comb: combinaison) : bool =
 (* fonction est_groupe *)
 
 (* An intermediate function that compares a tuile to the value in the accumulator:
- * the accumulator is a tupple containing a list of previous colors, the previous value, 
- * and the status of the current sequence (is it a suite or not ?) *)
+ * the accumulator is a tupple containing a list of previous colors, the previous number, 
+ * and the status of the current sequence (is it a groupe or not ?) *)
 
 let f_groupe (coul_list,num,statut : couleur multiensemble * int * bool) (tuile : tuile) : couleur multiensemble * int * bool =
     match tuile with 
