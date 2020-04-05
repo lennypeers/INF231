@@ -146,6 +146,8 @@ let la_main (joueur:joueur) (etat:etat) : main =
 
 (* Q10 *)
 
+(* to do: comments and non exhaustive match *)
+
 let rec remove_first_joker (li : tuile list) : int * tuile list = (* return nb of joker that has been removed and new list *)
     match li with
     | [] -> 0,[]
@@ -165,6 +167,23 @@ let est_suite (comb: combinaison) : bool =
     let _,_,_,statut = List.fold_left f_suite (n,valeur - 1,couleur,true) liste_simplifiee 
     in statut ;;
 
+let f_groupe (coul_list,num,statut : couleur multiensemble *int* bool) (tuile : tuile) : couleur multiensemble * int * bool =
+    match tuile with 
+    | Joker -> (coul_list, num, statut)
+    | T(valeur,couleur) -> ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur == num)) ;;
+
+let est_groupe (comb: combinaison) : bool =
+    (List.length comb = 3 || List.length comb = 4) &&
+    let _,list_simplifiee = remove_first_joker comb in
+    let T(valeur,_) = (List.hd list_simplifiee) in
+    let _,_,statut = List.fold_left f_groupe ([], valeur, true) list_simplifiee 
+    in statut ;;
+
+let combinaison_valide (comb: combinaison) : bool =
+    est_suite comb || est_groupe comb ;;
+
+let combinaisons_valides (comb_list: combinaison list) : bool =
+    comb_list <> [] && List.fold_left (fun x y -> x && combinaison_valide y ) true comb_list ;; 
 
 
 
