@@ -164,12 +164,12 @@ let rec remove_first_joker (li : tuile list) : int * tuile list =
 let f_suite (nombre_joker,valeur,couleur,statut : int * valeur * couleur * bool) (tuile : tuile) : int * valeur * couleur * bool = 
     match tuile with
     | Joker -> 
-        ( nombre_joker, valeur +1, couleur, statut && ( valeur < 14 ) )
+        ( nombre_joker, valeur +1, couleur, statut && ( valeur + 1 <= 14 ) )
     | T(valeur2,couleur2) -> 
-        (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 < 14 )) ;;
+        (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 <= 14 )) ;;
 
 let est_suite (comb: combinaison) : bool = 
-    List.length comb > 2 && 
+    List.length comb >= 3 && 
     let n,liste_simplifiee = remove_first_joker comb in 
     match List.hd liste_simplifiee with 
         | Joker -> failwith "case that will never happen" 
