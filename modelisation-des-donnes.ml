@@ -146,10 +146,8 @@ let la_main (joueur:joueur) (etat:etat) : main =
 
 (* Q10 *)
 
-(* to do: comments *)
-
-(* function that returns the number of Jokers in the head of the list
- * and a new list without these Jokers in the head. *)
+(* Function that returns the number of jokers in the head of the list
+ * and a new list without these jokers in the head. *)
 
 let rec remove_first_joker (li : tuile list) : int * tuile list = 
     match li with
@@ -168,7 +166,7 @@ let f_suite (nombre_joker,valeur,couleur,statut : int * valeur * couleur * bool)
     | Joker -> 
         ( nombre_joker, valeur +1, couleur, statut && ( valeur < 14 ) )
     | T(valeur2,couleur2) -> 
-            (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 < 14 )) ;;
+        (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 < 14 )) ;;
 
 let est_suite (comb: combinaison) : bool = 
     List.length comb > 2 && 
@@ -181,10 +179,16 @@ let est_suite (comb: combinaison) : bool =
 
 (* fonction est_groupe *)
 
+(* An intermediate function that compares a tuile to the value in the accumulator:
+ * the accumulator is a tupple containing a list of previous colors, the previous value, 
+ * and the status of the current sequence (is it a suite or not ?) *)
+
 let f_groupe (coul_list,num,statut : couleur multiensemble * int * bool) (tuile : tuile) : couleur multiensemble * int * bool =
     match tuile with 
-    | Joker -> (coul_list, num, statut)
-    | T(valeur,couleur) -> ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur == num)) ;;
+    | Joker -> 
+        (coul_list, num, statut)
+    | T(valeur,couleur) ->
+        ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur == num)) ;;
 
 let est_groupe (comb: combinaison) : bool =
     (List.length comb = 3 || List.length comb = 4) &&
