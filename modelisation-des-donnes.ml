@@ -207,6 +207,34 @@ let combinaison_valide (comb: combinaison) : bool =
 let combinaisons_valides (comb_list: combinaison list) : bool =
     comb_list <> [] && List.fold_left (fun x y -> x && combinaison_valide y ) true comb_list ;; 
 
+(* Q11 : Calcul des points *)
 
+let points_suite (comb : combinaison) : int =
+    let n,liste_simplifiee = remove_first_joker comb in 
+    match List.hd liste_simplifiee with 
+        | Joker -> failwith "case that will never happen" 
+        | T(valeur,couleur) ->
+    let _,valeur,_,_ = List.fold_left f_suite (n,valeur - 1,couleur,true) liste_simplifiee 
+    in List.length comb * ( 2 * valeur - List.length comb + 1 ) / 2 ;;
+
+let points_groupe (comb: combinaison) : int =
+    let len = List.length comb in
+    let rec f (comb: combinaison):int=
+        match comb with
+            | Joker::b -> f b
+            | T(valeur,couleur)::_ -> valeur * len
+            | _ -> failwith "never happen"
+    in f comb ;;
+
+let points_pose (pose : pose) : int =
+    let f_pose = fun (acc : int) (x : combinaison) ->
+        acc + (
+        if (est_groupe x) && (est_suite x)
+        then max (points_groupe x) (points_suite x)
+        else
+            if est_groupe x
+            then  points_groupe x
+            else  points_suite x ) in
+    List.fold_left f_pose 0 pose ;;
 
 (* end *) 
