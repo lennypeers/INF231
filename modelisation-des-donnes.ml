@@ -237,4 +237,20 @@ let points_pose (pose : pose) : int =
             else  points_suite x ) in
     List.fold_left f_pose 0 pose ;;
 
+(* Q12 : tableVmens *)
+
+let tableVmens (table: table) : tuile multiensemble =
+    List.fold_left (fun acc x -> ajoute (x,1) acc) [] (List.flatten table) ;;
+
+(* Q13 *)
+
+let poseVmens (p: pose) : tuile multiensemble =
+    en_ordre (List.fold_left (fun acc x -> ajoute (x,1) acc) [] (List.flatten p) );;
+
+let premier_coup_ok (m1: main) (p :pose) (m2: main) : bool =
+    difference m1 m2 == poseVmens p && points_pose p >= 30 ;;
+
+let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool=
+    en_ordre (difference m0 m1) == en_ordre (difference (tableVmens t0) (tableVmens t1)) ;;
+ 
 (* end *) 
