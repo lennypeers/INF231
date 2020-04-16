@@ -240,7 +240,7 @@ let points_pose (pose : pose) : int =
 (* Q12 : tableVmens *)
 
 let tableVmens (table: table) : tuile multiensemble =
-    en_ordre (List.fold_left (fun acc x -> ajoute (x,1) acc) [] (List.flatten p) );;
+    en_ordre (List.fold_left (fun acc x -> ajoute (x,1) acc) [] (List.flatten table) );;
 
 
 (* Q13 *)
