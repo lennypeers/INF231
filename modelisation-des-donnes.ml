@@ -245,8 +245,8 @@ let tableVmens (table: table) : tuile multiensemble =
 
 (* Q13 *)
 
-let premier_coup_ok (m1: main) (p :pose) (m2: main) : bool =
-    difference m1 m2 == poseVmens p && points_pose p >= 30 ;;
+let premier_coup_ok (m0: main) (p :pose) (m1: main) : bool =
+    difference m0 m1 == tableVmens p && points_pose p >= 30 ;;
 
 let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool=
     en_ordre (difference m0 m1) == en_ordre (difference (tableVmens t0) (tableVmens t1)) ;;
