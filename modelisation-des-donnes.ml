@@ -58,8 +58,8 @@ let en_ordre (ens:tuile multiensemble) : tuile multiensemble =
         match (a,b) with
             | (_,Joker) -> true
             | (T(n1,Bleu),T(n2,couleur)) -> (couleur <> Bleu) || n1 < n2
-            | (T(n1,Rouge),T(n2,couleur)) -> couleur = Jaune || couleur = Noir || (couleur = Rouge && n1 < n2) 
-            | (T(n1,Jaune),T(n2,couleur)) -> couleur = Noir || (couleur = Jaune && n1 < n2)
+            | (T(n1,Rouge),T(n2,couleur)) -> couleur = Jaune || couleur = Noir || (couleur = Rouge && n1 <= n2) 
+            | (T(n1,Jaune),T(n2,couleur)) -> couleur = Noir || (couleur = Jaune && n1 <= n2)
             | (T(n1,Noir),T(n2,couleur)) -> couleur = Noir && n1 < n2
             | _ -> false in
 
@@ -164,9 +164,9 @@ let rec remove_first_joker (li : tuile list) : int * tuile list =
 let f_suite (nombre_joker,valeur,couleur,statut : int * valeur * couleur * bool) (tuile : tuile) : int * valeur * couleur * bool = 
     match tuile with
     | Joker -> 
-        ( nombre_joker, valeur +1, couleur, statut && ( valeur + 1 <= 14 ) )
+        ( nombre_joker, valeur +1, couleur, statut && ( valeur + 1 <= 13 ) )
     | T(valeur2,couleur2) -> 
-        (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 == couleur) && (valeur2 == valeur + 1) && ( valeur2 <= 14 )) ;;
+        (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 = couleur) && (valeur2 = valeur + 1) && ( valeur2 <= 13 )) ;;
 
 let est_suite (comb: combinaison) : bool = 
     List.length comb >= 3 && 
@@ -188,7 +188,7 @@ let f_groupe (coul_list,num,statut : couleur multiensemble * int * bool) (tuile 
     | Joker -> 
         (coul_list, num, statut)
     | T(valeur,couleur) ->
-        ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur == num)) ;;
+        ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur = num)) ;;
 
 let est_groupe (comb: combinaison) : bool =
     (List.length comb = 3 || List.length comb = 4) &&
@@ -246,9 +246,9 @@ let tableVmens (table: table) : tuile multiensemble =
 (* Q13 *)
 
 let premier_coup_ok (m0: main) (p :pose) (m1: main) : bool =
-    difference m0 m1 == tableVmens p && points_pose p >= 30 ;;
+    difference m0 m1 = tableVmens p && points_pose p >= 30 ;;
 
 let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool=
-    en_ordre (difference m0 m1) == en_ordre (difference (tableVmens t0) (tableVmens t1)) ;;
+    en_ordre (difference m0 m1) = en_ordre (difference (tableVmens t0) (tableVmens t1)) ;;
  
 (* end *)  
