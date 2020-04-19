@@ -36,3 +36,58 @@ let s2y = [T(9,Jaune) ; T(10,Jaune) ; Joker ; T(12,Jaune)] ;;
 let s3y = [Joker ; Joker ; T(10,Bleu)] ;;
 (* 27 pts /!\ it is also a groupe *)
 
+
+let t0 =
+[[T (7, Rouge); T (7, Bleu); T (7, Jaune)];
+ [T (1, Noir); T (2, Noir); T (3, Noir); T (4, Noir)];
+ [T (9, Rouge); T (10, Rouge); T (11, Rouge)]] ;;
+
+let t1 =
+[[T (7, Rouge); T (7, Bleu); T (7, Jaune); T (7, Noir)];
+ [T (1, Noir); T (2, Noir); T (3, Noir)];
+ [T (3, Noir); T (4, Noir); T (5, Noir)];
+ [T (8, Rouge); T (9, Rouge); T (10, Rouge); T (11, Rouge)]] ;;
+
+let m0 = 
+[(T (7, Noir), 2); (T (8, Rouge), 1); (T (3, Noir), 1);
+ (T (5, Noir), 2)] ;;
+
+let m1 =
+[(T (7, Noir), 1); (T (5, Noir), 1)] ;;
+
+
+
+
+
+let c_extra = [
+    T(1,Noir) ;
+    T(3,Noir) ;
+    T(5,Noir) ;
+    T(7,Noir) ;
+    T(9,Noir) ;
+    T(11,Noir) ;
+
+    T(12,Jaune) ;
+
+    T(2,Rouge) ;
+    T(4,Rouge) ;
+    T(6,Rouge) ;
+    T(8,Rouge) ;
+    T(10,Rouge) ;
+
+    T(10,Jaune) ;
+
+    T(1,Bleu) ;
+    T(3,Bleu) ;
+    T(5,Bleu) ;
+    T(7,Bleu) ;
+    T(9,Bleu) ;
+
+    T(11,Jaune) ;
+
+    T(2,Jaune) ;
+    T(4,Jaune) ;
+    T(6,Jaune) ;
+    T(8,Jaune) ;
+
+]

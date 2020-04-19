@@ -246,9 +246,52 @@ let tableVmens (table: table) : tuile multiensemble =
 (* Q13 *)
 
 let premier_coup_ok (m0: main) (p :pose) (m1: main) : bool =
-    difference m0 m1 = tableVmens p && points_pose p >= 30 ;;
+    (combinaisons_valides p) && (difference m0 m1 = tableVmens p) && (points_pose p >= 30) ;;
 
-let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool=
-    en_ordre (difference m0 m1) = en_ordre (difference (tableVmens t0) (tableVmens t1)) ;;
+let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
+    (combinaisons_valides t1) && en_ordre (difference m0 m1) = en_ordre (difference (tableVmens t1) (tableVmens t0)) ;;
+
+(* Q14 *)
+
+(* Q15 *)
+
+(* 
+ *
+ * just saving my work
+ * seems to work, but not so efficient
+ *
+ *)
+
+let extraction_suite (main: main) : combinaison =
+    let rec extraction (main: main) (essai: int) =
+        if essai = 0
+        then []
+        else let t1 = un_dans main in let main = supprime (t1,1) main in
+             let t2 = un_dans main in let main = supprime (t2,1) main in
+             let t3 = un_dans main in
+             if est_suite [t1 ; t2 ; t3]
+             then [t1 ; t2 ; t3]
+             else extraction (main@[t1,1 ; t2,1]) (essai -1)
+    in extraction main (cardinal main * cardinal main * 10) ;;
+
+let extraction_groupe (main: main) : combinaison =
+    let rec extraction (main: main) (essai: int) =
+        if essai = 0
+        then []
+        else let t1 = un_dans main in let main = supprime (t1,1) main in
+             let t2 = un_dans main in let main = supprime (t2,1) main in
+             let t3 = un_dans main in
+             if est_groupe [t1 ; t2 ; t3]
+             then [t1 ; t2 ; t3]
+             else extraction (main@[t1,1 ; t2,1]) (essai -1)
+    in extraction main (cardinal main * cardinal main * 10) ;;
+
+(* to create m2: *)
+
+let remove_pose_from_hand (m1: main) (p: pose) : main =
+    List.fold_right (fun x l -> supprime (x,1) l) (List.flatten p) m1;;
+
+
+
  
 (* end *)  
