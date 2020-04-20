@@ -248,11 +248,12 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
 (* Q15 *)
 
 (* 
- *
- * just saving my work
- * seems to work, but not so efficient
- *
+ * Algorithm n2 : testing all the possible cases.
+ * In this algorithmn, we focus on the combinations of 3 tuiles.
  *)
+
+(* permutation_test: function that checks if the permutation of a 
+ *                   tupple of three tuiles can verify a predicate *) 
 
 let permutation_test (test: combinaison -> bool) =
     function  | t1,t2,t3 when test [t1;t2;t3] -> [t1;t2;t3] 
@@ -263,9 +264,12 @@ let permutation_test (test: combinaison -> bool) =
               | t1,t2,t3 when test [t3;t1;t2] -> [t3;t1;t2] 
               |  other -> [] ;;
 
+(* comparator: function that, for a given sort conditions, and a given predicate, slices into
+ *             a sorted list and returns the minimalist combinaison that satisfies the predicate. *)
+
 let comparator (f_sort: tuile -> tuile -> int) (f_comp: combinaison -> bool) (main: main) : combinaison =
 
-    (* conversion of the main to a tuile list while squeezing it *)
+    (* conversion of the main to a tuile list while squeezing it (remove the unnecessary copies) *)
     let number_joker,main = List.fold_left (fun (number_joker,acc) x -> match x with
                                             | Joker,1 -> 1,acc
                                             | Joker,2 -> 2,acc
@@ -291,7 +295,7 @@ let comparator (f_sort: tuile -> tuile -> int) (f_comp: combinaison -> bool) (ma
     let slice_two_jokers = function | t1::tail -> permutation_test f_comp (t1,Joker,Joker)
                                     | _ -> [] in
 
-
+    (* final_test: returns the combinaison with smallest number of joker *)
     let final_test = function | (main,_) when (slice_no_joker main <> []) -> slice_no_joker main 
                               | (main,n) when n >= 1 && (slice_one_joker main <> []) -> slice_one_joker main
                               | (main,2) when (slice_two_jokers main <> []) -> slice_two_jokers main 
