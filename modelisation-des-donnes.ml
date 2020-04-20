@@ -52,27 +52,19 @@ let cst_PIOCHE_INIT : pioche =
 
 (* Q7 *)
 
-let en_ordre (ens:tuile multiensemble) : tuile multiensemble =
-
+let en_ordre (ens: tuile multiensemble) : tuile multiensemble =
     let comp_ordre (a,occ1: tuile multielement) (b,occ2: tuile multielement) : bool =
         match (a,b) with
             | (_,Joker) -> true
-            | (T(n1,Bleu),T(n2,couleur)) -> (couleur <> Bleu) || n1 < n2
-            | (T(n1,Rouge),T(n2,couleur)) -> couleur = Jaune || couleur = Noir || (couleur = Rouge && n1 <= n2) 
-            | (T(n1,Jaune),T(n2,couleur)) -> couleur = Noir || (couleur = Jaune && n1 <= n2)
-            | (T(n1,Noir),T(n2,couleur)) -> couleur = Noir && n1 < n2
+            | (T(n1,couleur1),T(n2,couleur2)) -> (couleur1 < couleur2) || (couleur1 = couleur2 && n1 <= n2)
             | _ -> false in
-
-    let rec ordonne (ens: tuile multiensemble) (temp: tuile multiensemble) : tuile multiensemble =
-        match ens with 
-            | [] -> temp
-            | head1::tail1 -> match temp with
-                                | [] -> ordonne tail1 [head1]
-                                | head2::tail2 -> if (comp_ordre head1 head2)
-                                                  then ordonne tail1 (head1::head2::tail2)
-                                                  else ordonne ([head1]@tail1@[head2]) tail2
-    in ordonne ens [] ;;
-
+    let rec insertion = function | (x,[]) -> x::[]
+                                 | (x,head::tail) -> if comp_ordre x head
+                                                     then x::head::tail
+                                                     else head::(insertion (x,tail)) in
+    let rec tri = function | [] -> []
+                           | head::tail -> insertion (head,tri tail) in 
+    tri ens ;;
 
 (* 6.4 Les joueurs *)
 
