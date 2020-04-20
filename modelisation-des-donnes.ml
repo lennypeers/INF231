@@ -263,35 +263,57 @@ let permutation_test (test: combinaison -> bool) =
               | t1,t2,t3 when test [t3;t1;t2] -> [t3;t1;t2] 
               |  other -> [] ;;
 
-let squeeze_mens (main: main) : main =
-    List.map (function | (Joker,n) -> (Joker,n)
-                       | (x,n) -> (x,1)         ) main ;;
+let comparator (f_sort: tuile -> tuile -> int) (f_comp: combinaison -> bool) (main: main) : combinaison =
 
-let extraction_suite (main: main) : combinaison =
-    let rec extraction (main: main) (essai: int) =
-        if essai = 0
-        then []
-        else let t1 = un_dans main in let main = supprime (t1,1) main in
-             let t2 = un_dans main in let main = supprime (t2,1) main in
-             let t3 = un_dans main in
-             let res = permutation_test est_suite (t1,t2,t3) in
-                 if res <> []
-                 then res
-                 else extraction (main@[t1,1 ; t2,1]) (essai -1)
-    in extraction (squeeze_mens main) (cardinal main * cardinal main * 10) ;;
+    (* conversion of the main to a tuile list while squeezing it *)
+    let number_joker,main = List.fold_left (fun (number_joker,acc) x -> match x with
+                                            | Joker,1 -> 1,acc
+                                            | Joker,2 -> 2,acc
+                                            | tuile,_ -> number_joker,tuile::acc ) (0,[]) main in
+    (* sorting the list *)
+    let main = List.sort (f_sort) main in
 
-let extraction_groupe (main: main) : combinaison =
-    let rec extraction (main: main) (essai: int) =
-        if essai = 0
-        then []
-        else let t1 = un_dans main in let main = supprime (t1,1) main in
-             let t2 = un_dans main in let main = supprime (t2,1) main in
-             let t3 = un_dans main in
-             let res = permutation_test est_groupe (t1,t2,t3) in
-                 if res <> []
-                 then res
-                 else extraction (main@[t1,1 ; t2,1]) (essai -1)
-    in extraction (squeeze_mens main) (cardinal main * cardinal main * 10) ;;
+    (* slice with no joker *)
+    let rec slice_no_joker = function | t1::t2::t3::tail -> if f_comp [t1;t2;t3] 
+                                                            then [t1;t2;t3]
+                                                            else slice_no_joker (t2::t3::tail)
+                                      | _ -> [] in
+
+    (* slice with one joker *)
+    let rec slice_one_joker = function | t1::t2::tail -> let ret = permutation_test f_comp (t1,t2,Joker) in
+                                                             if ret <> []
+                                                             then ret
+                                                             else slice_one_joker (t2::tail) 
+                                       | _ -> [] in
+
+
+    (* slice with two jokers *)
+    let slice_two_jokers = function | t1::tail -> permutation_test f_comp (t1,Joker,Joker)
+                                    | _ -> [] in
+
+
+    let final_test = function | (main,_) when (slice_no_joker main <> []) -> slice_no_joker main 
+                              | (main,n) when n >= 1 && (slice_one_joker main <> []) -> slice_one_joker main
+                              | (main,2) when (slice_two_jokers main <> []) -> slice_two_jokers main 
+                              | _ -> [] 
+
+    in final_test (main,number_joker) ;;
+
+let extraction_suite = comparator (fun x y -> match x,y with
+                                     | T(n1, couleur1),T(n2, couleur2) 
+                                       when (couleur1 < couleur2) || (couleur1 = couleur2 && n1 <= n2) -> -1
+                                     | _ -> 1 ) (est_suite) ;;
+
+let extraction_groupe = comparator (fun x y -> match x,y with
+                                     | T(n1, _),T(n2, _) when n1 > n2 -> 1
+                                     | T(n1, _),T(n2, _) when n1 = n2 -> 0
+                                     | _ -> -1 ) (est_groupe) ;;
+
+
+
+
+
+
 
 (* to create m2: *)
 
