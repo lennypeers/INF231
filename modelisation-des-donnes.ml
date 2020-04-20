@@ -262,6 +262,19 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
  *
  *)
 
+let permutation_test (test: combinaison -> bool) =
+    function  | t1,t2,t3 when test [t1;t2;t3] -> [t1;t2;t3] 
+              | t1,t2,t3 when test [t1;t3;t2] -> [t1;t3;t2] 
+              | t1,t2,t3 when test [t2;t1;t3] -> [t2;t1;t3] 
+              | t1,t2,t3 when test [t2;t3;t1] -> [t2;t3;t1] 
+              | t1,t2,t3 when test [t3;t2;t1] -> [t3;t2;t1] 
+              | t1,t2,t3 when test [t3;t1;t2] -> [t3;t1;t2] 
+              |  other -> [] ;;
+
+let squeeze_mens (main: main) : main =
+    List.map (function | (Joker,n) -> (Joker,n)
+                       | (x,n) -> (x,1)         ) main ;;
+
 let extraction_suite (main: main) : combinaison =
     let rec extraction (main: main) (essai: int) =
         if essai = 0
@@ -269,10 +282,11 @@ let extraction_suite (main: main) : combinaison =
         else let t1 = un_dans main in let main = supprime (t1,1) main in
              let t2 = un_dans main in let main = supprime (t2,1) main in
              let t3 = un_dans main in
-             if est_suite [t1 ; t2 ; t3]
-             then [t1 ; t2 ; t3]
-             else extraction (main@[t1,1 ; t2,1]) (essai -1)
-    in extraction main (cardinal main * cardinal main * 10) ;;
+             let res = permutation_test est_suite (t1,t2,t3) in
+                 if res <> []
+                 then res
+                 else extraction (main@[t1,1 ; t2,1]) (essai -1)
+    in extraction (squeeze_mens main) (cardinal main * cardinal main * 10) ;;
 
 let extraction_groupe (main: main) : combinaison =
     let rec extraction (main: main) (essai: int) =
@@ -281,10 +295,11 @@ let extraction_groupe (main: main) : combinaison =
         else let t1 = un_dans main in let main = supprime (t1,1) main in
              let t2 = un_dans main in let main = supprime (t2,1) main in
              let t3 = un_dans main in
-             if est_groupe [t1 ; t2 ; t3]
-             then [t1 ; t2 ; t3]
-             else extraction (main@[t1,1 ; t2,1]) (essai -1)
-    in extraction main (cardinal main * cardinal main * 10) ;;
+             let res = permutation_test est_groupe (t1,t2,t3) in
+                 if res <> []
+                 then res
+                 else extraction (main@[t1,1 ; t2,1]) (essai -1)
+    in extraction (squeeze_mens main) (cardinal main * cardinal main * 10) ;;
 
 (* to create m2: *)
 
