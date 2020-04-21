@@ -314,8 +314,20 @@ let extraction_groupe = comparator (fun x y -> match x,y with
                                      | _ -> -1 ) (est_groupe) ;;
 
 
+(* Q16 *)
 
-
+let piocher (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur : etat) : etat =
+  if pioche = [] 
+  then (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur)
+  else
+    let new_card = un_dans pioche in
+    match joueur with
+    | J1 ->
+        let m1 = ajoute (new_card,1) m1 and new_pioche = supprime (new_card,1) pioche
+        in (((j1,b1,m1), (j2,b2,m2)), table, new_pioche, J2)
+    | J2->
+        let m1 = ajoute (new_card,1) m1 and new_pioche = supprime (new_card,1) pioche
+        in (((j1,b1,m1), (j2,b2,m2)), table, new_pioche, J1) ;;
 
 
 
