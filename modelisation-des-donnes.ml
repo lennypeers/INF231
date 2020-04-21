@@ -174,7 +174,7 @@ let f_groupe (coul_list,num,est_debut,statut : couleur multiensemble * valeur * 
         (coul_list, num, est_debut, statut)
     | T(valeur,couleur) ->
         if est_debut
-        then ([], valeur, false, true)
+        then ((couleur,1)::[], valeur, false, true)
         else ((couleur,1)::coul_list, num, false, statut && (not (appartient couleur coul_list)) && (valeur = num)) ;;
 
 let est_groupe (comb: combinaison) : bool =
