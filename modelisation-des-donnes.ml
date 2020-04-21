@@ -253,14 +253,13 @@ let permutation_test (test: combinaison -> bool) =
               |  other -> [] ;;
 
 (* comparator: function that, for a given sort conditions, and a given predicate, slices into
- *             a sorted list and returns the minimalist combinaison that satisfies the predicate. *)
+ *             a sorted list and returns the minimal combinaison that satisfies the predicate. *)
 
 let comparator (f_sort: tuile -> tuile -> int) (f_comp: combinaison -> bool) (main: main) : combinaison =
 
     (* conversion of the main to a tuile list while squeezing it (remove the unnecessary copies) *)
     let number_joker,main = List.fold_left (fun (number_joker,acc) x -> match x with
-                                            | Joker,1 -> 1,acc
-                                            | Joker,2 -> 2,acc
+                                            | Joker,n -> n,acc
                                             | tuile,_ -> number_joker,tuile::acc ) (0,[]) main in
     (* sorting the list *)
     let main = List.sort (f_sort) main in
@@ -283,13 +282,12 @@ let comparator (f_sort: tuile -> tuile -> int) (f_comp: combinaison -> bool) (ma
     let slice_two_jokers = function | t1::tail -> permutation_test f_comp (t1,Joker,Joker)
                                     | _ -> [] in
 
-    (* final_test: returns the combinaison with smallest number of joker *)
-    let final_test = function | (main,_) when (slice_no_joker main <> []) -> slice_no_joker main 
-                              | (main,n) when n >= 1 && (slice_one_joker main <> []) -> slice_one_joker main
-                              | (main,2) when (slice_two_jokers main <> []) -> slice_two_jokers main 
-                              | _ -> [] 
-
-    in final_test (main,number_joker) ;;
+    (* returning the combinaison with smallest number of joker *)
+    match (main,number_joker) with
+        | (main,_) when (slice_no_joker main <> []) -> slice_no_joker main 
+        | (main,n) when n >= 1 && (slice_one_joker main <> []) -> slice_one_joker main
+        | (main,2) when (slice_two_jokers main <> []) -> slice_two_jokers main 
+        | _ -> [] ;;
 
 let extraction_suite = comparator (fun x y -> match x,y with
                                      | T(n1, couleur1),T(n2, couleur2) 
