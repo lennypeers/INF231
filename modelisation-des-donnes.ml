@@ -53,7 +53,7 @@ let cst_PIOCHE_INIT : pioche =
 (* Q7 *)
 
 let en_ordre (ens: tuile multiensemble) : tuile multiensemble =
-    let comp_ordre (a,occ1: tuile multielement) (b,occ2: tuile multielement) : bool =
+    let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
         match (a,b) with
             | (_,Joker) -> true
             | (T(n1,couleur1),T(n2,couleur2)) -> (couleur1 < couleur2) || (couleur1 = couleur2 && n1 <= n2)
@@ -316,27 +316,51 @@ let extraction_groupe = comparator (fun x y -> match x,y with
 
 (* Q16 *)
 
-let piocher (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur : etat) : etat =
+let piocher (etat: etat) : etat =
+  let (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur) = etat in 
   if pioche = [] 
-  then (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur)
-  else
-    let new_card = un_dans pioche in
+  then etat
+  else 
+    let new_card = un_dans pioche in 
+    let pioche = supprime (new_card,1) pioche in
     match joueur with
     | J1 ->
-        let m1 = ajoute (new_card,1) m1 and new_pioche = supprime (new_card,1) pioche
-        in (((j1,b1,m1), (j2,b2,m2)), table, new_pioche, J2)
+        let m1 = en_ordre (ajoute (new_card,1) m1)         
+        in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J2)
     | J2->
-        let m1 = ajoute (new_card,1) m1 and new_pioche = supprime (new_card,1) pioche
-        in (((j1,b1,m1), (j2,b2,m2)), table, new_pioche, J1) ;;
+        let m2 = en_ordre (ajoute (new_card,1) m2)
+        in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J1) ;;
 
+let remove_from_hand (liste: tuile multiensemble) (main: main) =
+    List.fold_right (fun elem x -> supprime elem x) liste main ;;
 
+let jouer_1_coup (etat: etat) (table: table) : etat = 
+    let (((j1 ,b1, m1), (j2,b2,m2)), table1, pioche, joueur) = etat in 
+    match joueur with 
+    | J1 -> let diff = difference (tableVmens table) (tableVmens table1) in
+            let new_main = remove_from_hand diff m1 in 
+                 if b1 = false || not (coup_ok table1 m1 table new_main) 
+                 then etat
+                 else ((j1, b1, new_main), (j2, b2, m2)), table, pioche, J2 
+    | J2 -> let diff = difference (tableVmens table) (tableVmens table1) in
+            let new_main = remove_from_hand diff m2 in 
+                 if b2 = false || not (coup_ok table1 m2 table new_main) 
+                 then etat
+                 else ((j1, b1, m1), (j2, b2, new_main)), table, pioche, J1 ;;
 
-(* to create m2: *)
+let joueur_1er_coup (etat: etat) (pose: pose) : etat =
+    let (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur) = etat in 
+    let new_table = pose @ table in
+    match joueur with
+    | J1 -> let new_main = remove_from_hand (tableVmens pose) m1 in
+                if b1 = true || not (premier_coup_ok m1 pose new_main)
+                then etat
+                else ((j1, true, new_main),(j2, b2, m2)), new_table, pioche, J2
+    | J2 -> let new_main = remove_from_hand (tableVmens pose) m2 in
+                if b2 = true || not (premier_coup_ok m2 pose new_main)
+                then etat
+                else ((j1, b1, m1),(j2, true, new_main)), new_table, pioche, J1 ;;
 
-let remove_pose_from_hand (m1: main) (p: pose) : main =
-    List.fold_right (fun x l -> supprime (x,1) l) (List.flatten p) m1;;
+    
 
-
-
- 
 (* end *)  
