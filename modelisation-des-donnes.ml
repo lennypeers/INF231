@@ -58,13 +58,13 @@ let en_ordre (ens: tuile multiensemble) : tuile multiensemble =
             | (_,Joker) -> true
             | (T(n1,couleur1),T(n2,couleur2)) -> (couleur1 < couleur2) || (couleur1 = couleur2 && n1 <= n2)
             | _ -> false in
-    let rec insertion = function | (x,[]) -> x::[]
-                                 | (x,head::tail) -> if comp_ordre x head
-                                                     then x::head::tail
-                                                     else head::(insertion (x,tail)) in
+    let rec insertion x = function | [] -> x::[]
+                                   | head::tail -> if comp_ordre x head
+                                                   then x::head::tail
+                                                   else head::(insertion x tail) in
     let rec tri = function | [] -> []
-                           | head::tail -> insertion (head,tri tail) in 
-    tri ens ;;
+                           | head::tail -> insertion head (tri tail)  
+    in tri ens ;;
 
 (* 6.4 Les joueurs *)
 
