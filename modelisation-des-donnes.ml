@@ -138,57 +138,48 @@ let la_main (joueur:joueur) (etat:etat) : main =
 
 (* Q10 *)
 
-(* Function that returns the number of jokers in the head of the list
- * and a new list without these jokers in the head. *)
-
-let rec remove_first_joker (li : tuile list) : int * tuile list = 
-    match li with
-    | [] -> 0,[]
-    | T(n,c)::tail -> 0,T(n,c)::tail
-    | Joker::tail -> let n,l = remove_first_joker tail in (n + 1, l);;
-
 (* fonction est_suite *)
 
 (* An intermediate function that compares a tuile to the value in the accumulator:
- * the accumulator is a tupple containing the number of jokers, the previous value, the color of the 
- * sequence and the status of the current sequence (is it a suite or not ?) *)
+ * the accumulator is a tupple containing the previous value, the color of the 
+ * sequence, a bool that says if we already matched a tuile that is not a Joker
+ * and the status of the current sequence (is it a suite or not ?) *)
 
-let f_suite (nombre_joker,valeur,couleur,statut : int * valeur * couleur * bool) (tuile : tuile) : int * valeur * couleur * bool = 
+let f_suite (valeur,couleur,est_debut,statut : valeur * couleur * bool * bool) (tuile : tuile) : valeur * couleur * bool * bool = 
     match tuile with
     | Joker -> 
-        ( nombre_joker, valeur +1, couleur, statut && ( valeur + 1 <= 13 ) )
+       if est_debut
+       then (valeur +1, couleur, true, true)    
+       else (valeur +1, couleur, false, statut && ( valeur + 1 <= 13 ))
     | T(valeur2,couleur2) -> 
-        (nombre_joker, valeur +1 , couleur, statut && (nombre_joker < valeur2) && (couleur2 = couleur) && (valeur2 = valeur + 1) && ( valeur2 <= 13 )) ;;
+       if est_debut
+       then (valeur2, couleur2, false, (valeur < valeur2) && (valeur2 <= 13) )
+       else (valeur +1 , couleur, false, statut && (couleur2 = couleur) && (valeur2 = valeur + 1) && ( valeur2 <= 13 )) ;;
 
 let est_suite (comb: combinaison) : bool = 
     List.length comb >= 3 && 
-    let n,liste_simplifiee = remove_first_joker comb in 
-    match List.hd liste_simplifiee with 
-        | Joker -> failwith "case that will never happen" 
-        | T(valeur,couleur) ->
-    let _,_,_,statut = List.fold_left f_suite (n,valeur - 1,couleur,true) liste_simplifiee 
+    let _,_,_,statut = List.fold_left f_suite (0, Jaune, true, true) comb 
     in statut ;;
 
 (* fonction est_groupe *)
 
 (* An intermediate function that compares a tuile to the value in the accumulator:
  * the accumulator is a tupple containing a list of previous colors, the previous number, 
+ * a bool that says if we already matched a tuile that is not a Joker
  * and the status of the current sequence (is it a groupe or not ?) *)
 
-let f_groupe (coul_list,num,statut : couleur multiensemble * int * bool) (tuile : tuile) : couleur multiensemble * int * bool =
+let f_groupe (coul_list,num,est_debut,statut : couleur multiensemble * valeur * bool * bool) (tuile : tuile) : couleur multiensemble * valeur * bool * bool =
     match tuile with 
     | Joker -> 
-        (coul_list, num, statut)
+        (coul_list, num, est_debut, statut)
     | T(valeur,couleur) ->
-        ((couleur,1)::coul_list, num, statut && (not (appartient couleur coul_list)) && (valeur = num)) ;;
+        if est_debut
+        then ([], valeur, false, true)
+        else ((couleur,1)::coul_list, num, false, statut && (not (appartient couleur coul_list)) && (valeur = num)) ;;
 
 let est_groupe (comb: combinaison) : bool =
     (List.length comb = 3 || List.length comb = 4) &&
-    let _,list_simplifiee = remove_first_joker comb in
-    match List.hd list_simplifiee with
-        | Joker -> failwith "case that will never happen"
-        | T(valeur,_) ->
-    let _,_,statut = List.fold_left f_groupe ([], valeur, true) list_simplifiee 
+    let _,_,_,statut = List.fold_left f_groupe ([], 0, true, true) comb
     in statut ;;
 
 (* fonction de verification des combinaisons *)
@@ -202,12 +193,9 @@ let combinaisons_valides (comb_list: combinaison list) : bool =
 (* Q11 : Calcul des points *)
 
 let points_suite (comb : combinaison) : int =
-    let n,liste_simplifiee = remove_first_joker comb in 
-    match List.hd liste_simplifiee with 
-        | Joker -> failwith "case that will never happen" 
-        | T(valeur,couleur) ->
-    let _,valeur,_,_ = List.fold_left f_suite (n,valeur - 1,couleur,true) liste_simplifiee 
-    in List.length comb * ( 2 * valeur - List.length comb + 1 ) / 2 ;;
+    let valeur,_,_,_ = List.fold_left f_suite (0, Noir, true, true) comb 
+    and len = List.length comb 
+    in len * ( 2 * valeur - len + 1 ) / 2 ;;
 
 let points_groupe (comb: combinaison) : int =
     let len = List.length comb in
