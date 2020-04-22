@@ -141,46 +141,45 @@ let la_main (joueur:joueur) (etat:etat) : main =
 (* fonction est_suite *)
 
 (* An intermediate function that compares a tuile to the value in the accumulator:
- * the accumulator is a tupple containing the previous value, the color of the 
- * sequence, a bool that says if we already matched a tuile that is not a Joker
- * and the status of the current sequence (is it a suite or not ?) *)
+ * the accumulator is a tupple containing the length of the combinaison, the previous value, 
+ * the color of the sequence, a bool that says if we already matched a tuile that is not 
+ * a Joker and the status of the current sequence (is it a suite or not ?) *)
 
-let f_suite (valeur,couleur,est_debut,statut : valeur * couleur * bool * bool) (tuile : tuile) : valeur * couleur * bool * bool = 
+let f_suite (len,valeur,couleur,est_debut,statut : int * valeur * couleur * bool * bool) (tuile : tuile) : int * valeur * couleur * bool * bool = 
     match tuile with
     | Joker -> 
        if est_debut
-       then (valeur +1, couleur, true, true)    
-       else (valeur +1, couleur, false, statut && ( valeur + 1 <= 13 ))
+       then (len +1, valeur +1, couleur, true, true)    
+       else (len +1, valeur +1, couleur, false, statut && ( valeur + 1 <= 13 ))
     | T(valeur2,couleur2) -> 
        if est_debut
-       then (valeur2, couleur2, false, (valeur < valeur2) && (valeur2 <= 13) )
-       else (valeur +1 , couleur, false, statut && (couleur2 = couleur) && (valeur2 = valeur + 1) && ( valeur2 <= 13 )) ;;
+       then (len +1, valeur2, couleur2, false, (valeur < valeur2) && (valeur2 <= 13) )
+       else (len +1, valeur +1 , couleur, false, statut && (couleur2 = couleur) && (valeur2 = valeur + 1) && ( valeur2 <= 13 )) ;;
 
 let est_suite (comb: combinaison) : bool = 
-    List.length comb >= 3 && 
-    let _,_,_,statut = List.fold_left f_suite (0, Jaune, true, true) comb 
-    in statut ;;
+    let len,_,_,_,statut = List.fold_left f_suite (0, 0, Jaune, true, true) comb 
+    in len >= 3 && statut ;;
 
 (* fonction est_groupe *)
 
 (* An intermediate function that compares a tuile to the value in the accumulator:
- * the accumulator is a tupple containing a list of previous colors, the previous number, 
+ * the accumulator is a tupple containing the length of the combinaison, a list of 
+ * previous colors, the previous number, 
  * a bool that says if we already matched a tuile that is not a Joker
  * and the status of the current sequence (is it a groupe or not ?) *)
 
-let f_groupe (coul_list,num,est_debut,statut : couleur multiensemble * valeur * bool * bool) (tuile : tuile) : couleur multiensemble * valeur * bool * bool =
+let f_groupe (len,coul_list,num,est_debut,statut : int * couleur multiensemble * valeur * bool * bool) (tuile : tuile) : int * couleur multiensemble * valeur * bool * bool =
     match tuile with 
     | Joker -> 
-        (coul_list, num, est_debut, statut)
+        (len +1, coul_list, num, est_debut, statut)
     | T(valeur,couleur) ->
         if est_debut
-        then ((couleur,1)::[], valeur, false, true)
-        else ((couleur,1)::coul_list, num, false, statut && (not (appartient couleur coul_list)) && (valeur = num)) ;;
+        then (len +1, (couleur,1)::[], valeur, false, true)
+        else (len +1, (couleur,1)::coul_list, num, false, statut && (not (appartient couleur coul_list)) && (valeur = num)) ;;
 
 let est_groupe (comb: combinaison) : bool =
-    (List.length comb = 3 || List.length comb = 4) &&
-    let _,_,_,statut = List.fold_left f_groupe ([], 0, true, true) comb
-    in statut ;;
+    let len,_,_,_,statut = List.fold_left f_groupe (0, [], 0, true, true) comb
+    in (len = 3 || len = 4) && statut ;;
 
 (* fonction de verification des combinaisons *)
 
@@ -193,18 +192,12 @@ let combinaisons_valides (comb_list: combinaison list) : bool =
 (* Q11 : Calcul des points *)
 
 let points_suite (comb : combinaison) : int =
-    let valeur,_,_,_ = List.fold_left f_suite (0, Noir, true, true) comb 
-    and len = List.length comb 
+    let len,valeur,_,_,_ = List.fold_left f_suite (0, 0, Noir, true, true) comb 
     in len * ( 2 * valeur - len + 1 ) / 2 ;;
 
 let points_groupe (comb: combinaison) : int =
-    let len = List.length comb in
-    let rec f (comb: combinaison):int=
-        match comb with
-            | Joker::b -> f b
-            | T(valeur,couleur)::_ -> valeur * len
-            | _ -> failwith "never happen"
-    in f comb ;;
+    let len,_,valeur,_,_ = List.fold_left f_groupe (0, [], 0, true, true) comb in
+    valeur * len ;;
 
 let points_pose (pose : pose) : int =
     let f_pose = fun (acc : int) (x : combinaison) ->
