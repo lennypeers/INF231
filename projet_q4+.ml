@@ -328,7 +328,7 @@ let jouer_1_coup (etat: etat) (table: table) : etat =
                  then etat
                  else ((j1, b1, m1), (j2, b2, new_main)), table, pioche, J1 ;;
 
-let joueur_1er_coup (etat: etat) (pose: pose) : etat =
+let jouer_1er_coup (etat: etat) (pose: pose) : etat =
     let (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur) = etat in 
     let new_table = pose @ table in
     match joueur with
