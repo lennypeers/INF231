@@ -273,7 +273,7 @@ let comparator (f_sort: tuile -> tuile -> int) (f_comp: combinaison -> bool) (ma
 
 
     (* slice with two jokers *)
-    let slice_two_jokers = function | t1::tail -> permutation_test f_comp (t1,Joker,Joker)
+    let slice_two_jokers = function | t1::_ -> permutation_test f_comp (t1,Joker,Joker)
                                     | _ -> [] in
 
     (* returning the combinaison with smallest number of joker *)
