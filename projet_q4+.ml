@@ -244,7 +244,7 @@ let permutation_test (test: combinaison -> bool) =
               | t1,t2,t3 when test [t2;t3;t1] -> [t2;t3;t1] 
               | t1,t2,t3 when test [t3;t2;t1] -> [t3;t2;t1] 
               | t1,t2,t3 when test [t3;t1;t2] -> [t3;t1;t2] 
-              |  other -> [] ;;
+              |  _ -> [] ;;
 
 (* comparator: function that, for a given sort conditions, and a given predicate, slices into
  *             a sorted list and returns the minimal combinaison that satisfies the predicate. *)
