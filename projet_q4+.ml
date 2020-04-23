@@ -222,8 +222,8 @@ let premier_coup_ok (m0: main) (p :pose) (m1: main) : bool =
     (combinaisons_valides p) && (difference m0 m1 = tableVmens p) && (points_pose p >= 30) ;;
 
 let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
-    (combinaisons_valides t1) && (en_ordre (difference m0 m1) = en_ordre (difference (tableVmens t1) (tableVmens t0)))
-     && (cardinal m0 > cardinal m1) ;;
+    (inclus  m1 m0) && (inclus (tableVmens t0) (tableVmens t1)) 
+    && (difference m0 m1 <> []) ;;
 
 (* Q14 *)
 
