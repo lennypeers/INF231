@@ -521,7 +521,7 @@ let print_comb (comb: combinaison) =
 let print_table (table: table) =
     List.fold_left (fun acc x -> print_comb x ; print_string normal "\n"; acc) () table ;
     print_string normal "\n" ;;
-;;
+
 (*  main program *)
 
 let () = print_string normal "La partie va commencer...\nTappez c pour clean l'écran\nTappez p pour piocher\n" 

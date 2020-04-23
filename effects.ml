@@ -38,4 +38,4 @@ let print_comb (comb: combinaison) =
 let print_table (table: table) =
     List.fold_left (fun acc x -> print_comb x ; print_string normal "\n"; acc) () table ;
     print_string normal "\n" ;;
-;;
+
