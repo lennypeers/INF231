@@ -5,7 +5,6 @@ let clean () : unit =
     erase Below ;;
 
 let help () : unit = 
-    clean () ;
     print_string normal "- To enter a tuile, type the number, followed by the first letter of its color\n" ;
     print_string normal "- To enter a combination, type the sequence of tuiles\n" ;
     print_string normal "- For instance, the combination T(1,Bleu) T(1,Jaune) T(1,Noir) T(1,Rouge) Joker is:\n" ;
@@ -17,7 +16,11 @@ let help () : unit =
     in () ;
 ;;
 
-let () = print_string normal "La partie va commencer...\nTappez c pour clean l'écran\nTappez p pour piocher\n" 
+let welcome () : unit = 
+    clean () ;
+    print_string [cyan] "A terminal based Rummikub\n" ;
+    print_string [cyan] "Powered by ANSITerminal\n\n" ;
+    help () ;;
 
 let string2tuiles (inp: string) : tuile list =
         match inp with
@@ -101,8 +104,8 @@ let ask (joueur: joueur) : unit =
         print_string normal "iocher/" ;
         print_string [red] "r" ;
         print_string normal "eorganiser/";
-        print_string [red] "j" ;
-        print_string normal "ouer/" ;
+        print_string [red] "a" ;
+        print_string normal "jouter/" ;
         print_string [red] "q" ;
         print_string normal "uitter/" ;
         print_string [red] "h" ;
@@ -130,6 +133,7 @@ let rec loop (etat: etat) : etat =
                               else loop (jouer_1_coup etat (la_table etat @ lire_table ()))
          | "quitter" | "q" -> print_string [red] "\nAu revoir \n"; exit 0
          | "help" | "h" -> begin
+                                clean () ;
                                 help () ;
                                 loop (etat) ;
                            end
@@ -138,7 +142,7 @@ let rec loop (etat: etat) : etat =
        
 Random.self_init () ;; (* random seed *)
 
-let () = help () ;;
+let () = welcome () ;;
 
 let etat = init_partie () ;;
 

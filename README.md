@@ -1,6 +1,6 @@
 # Rummikub
 
-A terminal based Rummikub
+A terminal based Rummikub. A work that uses the Library [ANSITerminal](https://github.com/Chris00/ANSITerminal)
 
 ## Preriquisities
 
@@ -25,7 +25,6 @@ make test
 # installation of brew: from https://brew.sh/ 
  
 /bin/bash -c "export HAVE_SUDO_ACCESS=1 &&  $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-
 
 echo 'eval $(~/.linuxbrew/bin/brew shellenv)' >> ~/.bash_profile
 source ~/.bash_profile
