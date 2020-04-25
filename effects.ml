@@ -21,7 +21,7 @@ let print_tuile (tuile: tuile) : unit =
     let str,style = tuile2string tuile in
     print_string (style) (str) ;;
 
-let print_mens (set: tuile multiensemble) =
+let print_mens (set: tuile multiensemble) : unit =
     (* conversion from mens to tuile list *)
     let set = List.fold_left (fun acc (x,n) -> match n with 
                                             | 1 -> acc @ [x]
@@ -29,11 +29,11 @@ let print_mens (set: tuile multiensemble) =
     in List.fold_left (fun acc x -> print_tuile x ; acc) () set;
      print_string normal "\n";;
 
-let print_comb (comb: combinaison) =
+let print_comb (comb: combinaison) : unit =
     List.fold_left (fun acc x -> print_tuile x ; acc) () comb ;
     print_string normal "\n" ;;
 
-let print_table (table: table) =
+let print_table (table: table) : unit =
     List.fold_left (fun acc x -> print_comb x ; print_string normal "\n"; acc) () table ;
     print_string normal "\n" ;;
 
