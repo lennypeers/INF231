@@ -1,7 +1,5 @@
 (* Some functions to make the interface *)
 
-#require "ANSITerminal"
-
 open ANSITerminal ;;
 
 (* somme shortcut for colors *)

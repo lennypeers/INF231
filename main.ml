@@ -64,7 +64,7 @@ let rec lire_combinaison () : combinaison =
         | _ -> lire_combinaison () ;;
 
 let lire_table () : table = 
-    print_string normal "Combien de combinaisons contient la table?\n";
+    print_string normal "\nCombien de combinaisons contient la table?\n";
     let n = read_int () in
     let rec lire (n: int) : table =
         if n = 0
@@ -81,19 +81,20 @@ let rec loop (etat: etat) : etat =
     then etat 
     else 
         begin
-            erase Above ;
+            set_cursor 1 1;
+            erase Below ;
             print_string normal "Voici la table:\n";
             print_table (la_table etat) ;
             print_string normal "Voici votre main:\n";
             print_mens (la_main (joueur_courant etat) etat) ;
-            print_string normal "Vous choisissez de piocher/poser ?\n";
+            print_string normal "\nVous choisissez de piocher/poser ?\n";
         let input = read_line () in
          match input with 
          | "piocher" -> loop (piocher etat)
          | "poser" -> if (est_premier_coup etat)
                       then loop (jouer_1er_coup etat (lire_table ()))
                       else loop (jouer_1_coup etat (lire_table())) 
-         | "q" -> print_string normal "Au revoir \n"; exit 0
+         | "q" -> print_string normal "\nAu revoir \n"; exit 0
          | _ -> loop (etat) 
         end ;; 
         
