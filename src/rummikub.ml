@@ -524,7 +524,7 @@ let en_ordre_groupe (ens: tuile multiensemble) : tuile multiensemble =
   let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
     match (a,b) with
     | (_,Joker) -> true
-    | (T(n1,couleur1),T(n2,couleur2)) ->  n1 <= n2
+    | (T(n1,_),T(n2,_)) ->  n1 <= n2
     | _ -> false in
   let rec insertion x = function | [] -> x::[]
                                  | head::tail -> if comp_ordre x head
@@ -722,9 +722,9 @@ let rec loop (etat: etat) : etat =
                                 help () ;
                                 loop (etat) ;
                            end
-         | "groupe"|"g"->if joueur_courant= J1 then (((j1,b1,en_ordre_groupe m1),(j2,b2,m2)),tbl,piom,joueur_courant ) 
+         | "groupe"|"g"->if joueur_courant= J1 then loop (((j1,b1,en_ordre_groupe m1),(j2,b2,m2)),tbl,piom,joueur_courant ) 
                          else
-                         (((j1,b1,m1),(j2,b2,en_ordre_groupe m2)),tbl,piom,joueur_courant )
+                         loop (((j1,b1,m1),(j2,b2,en_ordre_groupe m2)),tbl,piom,joueur_courant )
          | _ -> loop (etat) 
         end ;; 
        
