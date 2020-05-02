@@ -364,6 +364,47 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
 
 (* Q14 *)
 
+let ajouter_tuile (tuile: tuile) (table: table) : table =
+
+    (* adding the tuile to the head or tail of a combinaison if possible *)
+    let add_head_tail (tuile: tuile) (combinaison: combinaison) : combinaison = 
+        let comb = tuile :: combinaison in
+            if est_groupe comb || est_suite comb
+            then comb 
+            else
+        let comb = combinaison @ [tuile] in
+            if est_groupe comb || est_suite comb
+            then comb 
+            else [] in
+
+    (* replacing the eventuals jokers by the tuile while moving 
+     * the joker to the head or tail of the combinaison *)
+    let rec replace_joker (tuile: tuile) (combinaison_tail: combinaison) (combinaison_head: combinaison) : combinaison =
+        match combinaison_tail with
+        | Joker::tail -> let ret = add_head_tail Joker (combinaison_head @ (tuile :: tail)) in
+                            if  ret <> []
+                            then ret
+                            else replace_joker tuile tail (combinaison_head @ [Joker]) 
+        | head::tail -> replace_joker tuile tail (combinaison_head @ [head])
+        | _ -> [] in
+    
+    (* slice into the table while trying to insert the tuile *)
+    let f_fold (tuile: tuile) (elt: combinaison) (insert,table_finale: bool * table) : bool * table =
+        if not insert
+        then let ret = add_head_tail tuile elt in
+                if ret <> []
+                then true,(ret::table_finale)
+                else let ret = replace_joker tuile elt [] in
+                        if ret <> []
+                        then true,(ret::table_finale)
+                        else false,(elt::table_finale)
+        else insert,(elt::table_finale) in
+
+    let insert,ret = List.fold_right (f_fold tuile) table (false,[]) in 
+        if insert
+        then ret
+        else [] ;;
+
 (* Q15 *)
 
 (* 
