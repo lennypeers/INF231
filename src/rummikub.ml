@@ -520,7 +520,19 @@ let jouer_1er_coup (etat: etat) (pose: pose) : etat =
                 else ((j1, b1, m1),(j2, true, new_main)), new_table, pioche, J1 ;;
 
     
-
+let en_ordre_groupe (ens: tuile multiensemble) : tuile multiensemble =
+  let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
+    match (a,b) with
+    | (_,Joker) -> true
+    | (T(n1,couleur1),T(n2,couleur2)) ->  n1 <= n2
+    | _ -> false in
+  let rec insertion x = function | [] -> x::[]
+                                 | head::tail -> if comp_ordre x head
+                                     then x::head::tail
+                                     else head::(insertion x tail) in
+  let rec tri = function | [] -> []
+                         | head::tail -> insertion head (tri tail)  
+  in tri ens ;;
 (* end *)  
 (* Some functions to make the interface *)
 
@@ -560,6 +572,7 @@ let print_comb (comb: combinaison) : unit =
 let print_table (table: table) : unit =
     List.fold_left (fun acc x -> print_comb x ; print_string normal "\n"; acc) () table ;
     print_string normal "\n" ;;
+
 
 (*  main program *)
 
@@ -677,7 +690,9 @@ let ask (joueur: joueur) : unit =
         print_string [red] "q" ;
         print_string normal "uitter/" ;
         print_string [red] "h" ;
-        print_string normal  "elp ?\n" ;;
+        print_string normal  "elp ?\n" ;
+        print_string [red] "g" ;
+        print_string normal  "groupe ?\n";;
 
 let rec loop (etat: etat) : etat =
     if (la_pioche etat = [] || (la_main J1 etat = []) || (la_main J2 etat = []))
@@ -691,6 +706,8 @@ let rec loop (etat: etat) : etat =
             print_mens (la_main (joueur_courant etat) etat) ;
             ask (joueur_courant etat) ;
         let input = read_line () in
+        let (((j1,b1,m1),(j2,b2,m2)),tbl,piom,joueur_courant )= etat in 
+
          match input with 
          | "piocher" | "p" -> loop (piocher etat)
          | "reorganiser" | "r" -> if (est_premier_coup etat)
@@ -705,6 +722,9 @@ let rec loop (etat: etat) : etat =
                                 help () ;
                                 loop (etat) ;
                            end
+         | "groupe"|"g"->if joueur_courant= J1 then (((j1,b1,en_ordre_groupe m1),(j2,b2,m2)),tbl,piom,joueur_courant ) 
+                         else
+                         (((j1,b1,m1),(j2,b2,en_ordre_groupe m2)),tbl,piom,joueur_courant )
          | _ -> loop (etat) 
         end ;; 
        
