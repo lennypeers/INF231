@@ -5,8 +5,8 @@ let clean () : unit =
     erase Below ;;
 
 let help () : unit = 
-    print_string normal "- To enter a tuile, type the number, followed by the first letter (lower or uppercase) of its color\n" ;
-    print_string normal "- To enter a combination, type the sequence of tuiles\n" ;
+    print_string normal "- To enter a tile, type the number, followed by the first letter (lower or uppercase) of its color\n" ;
+    print_string normal "- To enter a combination, type the sequence of tiles\n" ;
     print_string normal "- For instance, the combination T(1,Bleu) T(1,Jaune) T(1,Noir) T(1,Rouge) Joker is:\n" ;
     print_string [Foreground(Green)] "           1B 1J 1N 1R J" ;
     print_string normal "    or also    " ;
@@ -183,7 +183,7 @@ let rec loop (etat: etat) (sorting) : etat =
                                         help () ;
                                         loop etat sorting;
                                    end
-                 | "tuile" | "t" -> begin 
+                 | "tile" | "t" -> begin 
                                         print_string normal "Enter the tile you want to add: ";
                                         loop (jouer_1_coup etat (ajouter_tuile (read_single_tile()) (la_table etat)) ) sorting
                                     end
