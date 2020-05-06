@@ -26,7 +26,8 @@ player 1 plays first move: [[(10,Bleu);(10,Jaune);(10,Noir)];[(1,Bleu);(1,Jaune)
 table:                     [[(5,Rouge);(6,Rouge);(7,Rouge);(8,Rouge);(9,Rouge)];
                             [(10,Bleu);(10,Jaune);(10,Noir)];
                             [(1,Bleu);(1,Jaune);(1,Rouge)]]
-
+ 
+ 
 player 2 draws 1 card
 player 1 draws 1 card
 player 2 draws 1 card
