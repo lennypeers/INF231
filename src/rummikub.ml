@@ -77,65 +77,6 @@ let un_dans (ens: 'a multiensemble) : 'a =
   in let ( random : int ) = Random.int(cardinal ens)
   in ieme (ens) (random);;
 
-(* Tests *)
-
-(* cardinal *)
-assert (cardinal [('a',5);('b',5);('c',5)] = 15) ;;
-assert (cardinal [] = 0) ;;
-
-(* occurences *)
-assert (nbocc 'a' [('a',5);('b',5);('c',5)] = 5) ;;
-assert (nbocc 'c' [('a',5);('b',5);('c',5)] = 5) ;;
-assert (nbocc 'z' [('a',5);('b',5);('c',5)] = 0) ;;
-assert (nbocc 'z' [] = 0) ;;
-
-(* appartenance *)
-assert (appartient 'a' [] = false) ;;
-assert (appartient 'c' [('a',5);('b',5);('c',5)] = true) ;;
-assert (appartient 'z' [('a',5);('b',5);('c',5)] = false) ;;
-
-(* inclusion *)
-assert (inclus [] [] = true) ;;
-assert (inclus [] [(5,3)] = true) ;;
-assert (inclus [(5,3)] [] = false) ;;
-assert (inclus [('a',2);('b',2)] [('a',2);('b',2)] = true) ;;
-assert (inclus [('a',2);('b',2)] [('a',2);('b',2);('c',2)] = true) ;;
-assert (inclus [('a',2);('b',2)] [('a',2);('b',1)] = false) ;;
-
-(* ajout *)
-assert (ajoute ('a',5) [] = [('a',5)]) ;;
-assert (ajoute ('a',0) [] = []) ;;
-assert (ajoute ('a',1) [('a',1)] = [('a',2)]) ;;
-assert (ajoute ('a',1) [('a',1);('b',1)] = [('a',2);('b',1)]) ;;
-
-(* suppression *)
-assert (supprime ('a',5) [] = []) ;;
-assert (supprime ('a',0) ['b',5] = ['b',5]) ;;
-assert (supprime ('a',1) [('a',1)] = []) ;;
-assert (supprime ('a',1) [('a',1);('b',1)] = ['b',1]) ;;
-
-(* egalite *)
-assert (egaux [] [] = true) ;;
-assert (egaux [] [(5,5)] = false) ;;
-assert (egaux [(5,5)] [(5,5)] = true) ;;
-assert (egaux [(5,5)] [(5,6)] = false) ;;
-
-(* intersection *)
-assert (intersection [('a',2);'b',2] [] = []) ;;
-assert (intersection [('a',2);'b',2] [('a',1)] = [('a',1)]) ;;
-assert (intersection [] [] = []) ;;
-
-(* difference *)
-assert (difference [('a',1);('b',1)] [] = [('a',1);('b',1)]) ;;
-assert (difference [(5,5)] [(5,3)] = [(5,2)]) ;;
-
-(* element aleatoire *)
-let ens = [('a',5);('b',5);('c',5)] in
-assert (let x = un_dans ens in appartient x ens) ;;
-
-
-(* end *)
-
 
 (* Q4 *)
 
@@ -145,7 +86,7 @@ type couleur =
     | Jaune 
     | Noir ;;
 
-type valeur = int (* restreint à l'intervalle [1,13] *) ;;
+type valeur = int (* interval [1,13] *) ;;
 
 type tuile = 
     | Joker 
@@ -154,9 +95,7 @@ type tuile =
 
 (* Q5 *)
 
-type combinaison = tuile list ;; (* avec l'ordre des tuiles dans un ordre 
-                                    croissant et de même couleur ou constant
-                                    avec des couleurs différentes. *)
+type combinaison = tuile list ;; 
 
 type table = combinaison list ;;
 
@@ -188,6 +127,20 @@ let cst_PIOCHE_INIT : pioche =
 
 
 (* Q7 *)
+
+(*
+ * algorithm: insertion sort
+ *
+ * comp_ordre: - tuile multielement -> tuile multielement -> bool
+ *             - (comp_ordre a b) is true if a <= b in lexicographic order.
+ *
+ * insertion: - tuile multielement -> tuile multiensemble -> tuile multiensemble
+ *            - (insertion a l) is the list l with a inserted.
+ *
+ * tri: - tuile multiensemble -> tuile multiensemble
+ *      - tri (ens) is the list ens sorted in lexicographic order
+ *
+ *)
 
 let en_ordre (ens: tuile multiensemble) : tuile multiensemble =
     let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
@@ -228,14 +181,14 @@ let extraire (n:int) (p:pioche) : main * pioche =
 
 
 let distrib () : main * main * pioche =
-  let (main1,pioche1) = extraire 14 cst_PIOCHE_INIT in 
-  let (main2,pioche2)= extraire 14 pioche1 in 
-  (main1,main2,pioche2) ;;
+    let (main1,pioche1) = extraire 14 cst_PIOCHE_INIT in 
+    let (main2,pioche2)= extraire 14 pioche1 in 
+    (main1,main2,pioche2) ;;
 
 
 let init_partie () : etat =
-  let (main1,main2,pioche) = distrib () in
-  (((J1,false,main1),(J2,false,main2)),[],pioche,J1) ;;
+    let (main1,main2,pioche) = distrib () in
+    (((J1,false,main1),(J2,false,main2)),[],pioche,J1) ;;
 
 
 (* 6.5.2 Accès aux informations d'un état *)
@@ -336,6 +289,8 @@ let points_groupe (comb: combinaison) : int =
     let len,_,valeur,_,_ = List.fold_left f_groupe (0, [], 0, true, true) comb in
     valeur * len ;;
 
+(* points_pose returns the maximal points if the combination is both group and sequence *)
+
 let points_pose (pose : pose) : int =
     let f_pose = fun (acc : int) (x : combinaison) ->
         acc + (
@@ -348,6 +303,8 @@ let points_pose (pose : pose) : int =
     List.fold_left f_pose 0 pose ;;
 
 (* Q12 : tableVmens *)
+
+(* List.flatten: 'a list list -> 'a list *)
 
 let tableVmens (table: table) : tuile multiensemble =
     en_ordre (List.fold_left (fun acc x -> ajoute (x,1) acc) [] (List.flatten table) );;
@@ -364,6 +321,13 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
     (diff_main <> []) && (inclus t0 t1) && (difference t1 t0 =  diff_main) ;;
 
 (* Q14 *)
+
+(* Algorithm used: 
+ *
+ * For all the combinaisons of the table:
+ * - Adding the tile to the head or head of the combination if it is possible
+ * - if not, slicing into the combination and replacing the eventuals jokers by the tile.
+ *)
 
 let ajouter_tuile (tuile: tuile) (table: table) : table =
 
@@ -410,8 +374,18 @@ let ajouter_tuile (tuile: tuile) (table: table) : table =
 
 (* 
  * Algorithm n2 : testing all the possible cases.
- * In this algorithmn, we focus on the combinations of 3 tuiles.
- *)
+ *
+ * In this algorithm, we focus on the combinations of 3 tuiles.
+ *
+ * Algorithm used: - conversion of the table to a tuile list while 
+ *                   removing duplicates (since they are useless)
+ *                   and jokers. (the number of joker removed is stored)
+ *                 - sorting the tuile list. The sorting algorithm depend on 
+ *                   the final combination.
+ *                 - slicing into the sorted list, without joker, with one eventual 
+ *                   joker, with two eventuals jokers.
+ *)         
+
 
 (* permutation_test: function that checks if the permutation of a 
  *                   tupple of three tuiles can verify a predicate *) 
@@ -520,10 +494,11 @@ let jouer_1er_coup (etat: etat) (pose: pose) : etat =
                 then etat
                 else ((j1, b1, m1),(j2, true, new_main)), new_table, pioche, J1 ;;
 
-    
-
-(* end *)  
-(* Some functions to make the interface *)
+(* Functions used in the terminal game 
+ *
+ * Depends on ANSITerminal 
+ *
+ * *)
 
 open ANSITerminal ;;
 
@@ -536,11 +511,17 @@ let bleu : style list = [Foreground(Blue)] and
     joker : style list= [Foreground(Cyan)] and
     normal : style list = [] ;;
 
+(* tuile2string: tuile -> string * style list 
+ * need to print the tiles 
+ *)
+
 let tuile2string = function | Joker -> " [J] ",joker
                             | T(n,Bleu) -> " [" ^ string_of_int(n) ^ "] ",bleu
                             | T(n,Jaune) -> " [" ^ string_of_int(n) ^ "] ",jaune
                             | T(n,Noir) -> " [" ^ string_of_int(n) ^ "] ",noir
                             | T(n,Rouge) -> " [" ^ string_of_int(n) ^ "] ",rouge ;;
+
+(* functions that print combinations, tables, hands... *)
 
 let print_tuile (tuile: tuile) : unit =
     let str,style = tuile2string tuile in
@@ -562,11 +543,19 @@ let print_table (table: table) : unit =
     List.fold_left (fun acc x -> print_comb x ; print_string normal "\n"; acc) () table ;
     print_string normal "\n" ;;
 
-(*  main program *)
+(* clear the terminal, setting the cursors on the top left corner *)
 
 let clean () : unit =
     set_cursor 1 1;
     erase Below ;;
+
+(* continue function : waits for a key *)
+
+let continue () : unit =
+    print_string rouge "\nHit enter to play!\n" ;
+    let _ = read_line () in () ;;
+
+(* help dialog *)
 
 let help () : unit = 
     print_string normal "- To enter a tile, type the number, followed by the first letter (lower or uppercase) of its color\n" ;
@@ -576,17 +565,19 @@ let help () : unit =
     print_string normal "    or also    " ;
     print_string [Foreground(Green)] "1b 1j 1n 1r j\n" ;
     print_string normal "- To enter a table or a pose, type the combinations, line by line.\n" ;
-    print_string normal "- To quit the game, type q\n\n\n" ;
-    print_string [Foreground(Red)] "Hit enter to play!\n" ;
-    let _ = read_line () 
-    in () ;
+    print_string normal "- To quit the game, type q\n\n" ;
+    continue () ;
 ;;
+
+(* greetings *)
 
 let welcome () : unit = 
     clean () ;
     print_string [cyan] "A terminal based Rummikub\n" ;
     print_string [cyan] "Powered by ANSITerminal\n\n" ;
     help () ;;
+
+(* converting a string to a tile, needed to read inputs on the keyboard *)
 
 let string2tuile (inp: string) : tuile =
         match inp with
@@ -649,7 +640,6 @@ let lire_combinaison () : combinaison =
     let inp = String.split_on_char ' ' (read_line()) 
     in List.fold_right (fun x acc -> try (string2tuile x) :: acc with _ -> acc ) inp [] ;;
 
-
 let lire_table () : table = 
     let rec readint () : int =
         print_string normal "How many combination do you want to put?\n";
@@ -668,29 +658,34 @@ let rec read_single_tile () : tuile =
     try string2tuile inp
     with _ -> read_single_tile () ;;
 
+(* missing function: checks if a player already played *)
+
 let est_premier_coup (etat: etat) : bool =
     let _,ret,_ = le_statut (joueur_courant etat) etat in
     not ret ;;
 
+(* printing all the possible actions *)
+
 let ask (joueur: joueur) : unit =
-        print_string [red] (if (joueur = J1) then "\nJ1:   " else "\nJ2:   ");
-        print_string [red] "d" ;
+        print_string rouge (if (joueur = J1) then "\nJ1:   " else "\nJ2:   ");
+        print_string rouge "d" ;
         print_string normal "raw / " ;
-        print_string [red] "r" ;
+        print_string rouge "r" ;
         print_string normal "eorganize / add a ";
-        print_string [red] "c" ;
+        print_string rouge "c" ;
         print_string normal "ombination or a " ;
-        print_string [red] "t" ;
+        print_string rouge "t" ;
         print_string normal "ile / " ;
-        print_string [red] "q" ;
+        print_string rouge "q" ;
         print_string normal "uit / " ;
-        print_string [red] "s" ;
+        print_string rouge "s" ;
         print_string normal "ort / h" ;
-        print_string [red] "i" ;
+        print_string rouge "i" ;
         print_string normal "nt / " ;
-        print_string [red] "h" ;
+        print_string rouge "h" ;
         print_string normal  "elp ?\n" ;;
 
+(* function to get a group view *)
 
 let en_ordre_groupe (ens: tuile multiensemble) : tuile multiensemble =
   let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
@@ -706,6 +701,8 @@ let en_ordre_groupe (ens: tuile multiensemble) : tuile multiensemble =
                          | head::tail -> insertion head (tri tail)  
   in tri ens ;;
 
+(* function that gives the possible valid combinations *)
+
 let hint (etat: etat) : unit =
     print_string normal "\nExisting combination: ";
     (let proposition = extraction_suite (la_main (joueur_courant etat) etat) in
@@ -715,10 +712,32 @@ let hint (etat: etat) : unit =
         if proposition <> []
         then print_comb proposition
         else print_string rouge "nothing found\n") ;
-    print_string rouge "\nHit enter to continue\n";
-    let _ = read_line () in () ;;
+   continue () ;;
 
+(* calculate the score *)
 
+let score (main: main) : int = 
+    List.fold_left (fun acc -> function | Joker,occ -> acc + 30 * occ 
+                                        | T(value,_),occ -> acc + value * occ ) 0 main ;;
+
+let gagnant (etat: etat) : unit =
+    clean ();
+    let score1 = score (la_main J1 etat) and score2 = score (la_main J2 etat) in
+        if score1 = score2 
+        then print_string rouge "\n\n\n\nWhat a tight game ! The match ended in a draw !"
+        else
+            begin
+                print_string normal "\n\nThe winner is ";
+                print_string rouge (if score1 < score2 then "J1" else "J2");
+                print_string normal " with a final score of ";
+                print_string rouge (string_of_int (min score1 score2));
+                print_string normal "\nfollowed by ";
+                print_string rouge (if score1 < score2 then "J2" else "J1");
+                print_string normal " with a final score of ";
+                print_string rouge (string_of_int (max score1 score2) ^ "\n\n\n"); 
+            end ;;
+
+(* main loop, finally c: *)
 
 let rec loop (etat: etat) (sorting) : etat =
     if (la_pioche etat = [] || (la_main J1 etat = []) || (la_main J2 etat = []))
@@ -741,7 +760,7 @@ let rec loop (etat: etat) (sorting) : etat =
                  | "c" -> if (est_premier_coup etat)
                           then loop (jouer_1er_coup etat (lire_table())) sorting
                           else loop (jouer_1_coup etat (la_table etat @ lire_table ())) sorting
-                 | "quit" | "q" -> print_string [red] "\nSee you !\n"; exit 0
+                 | "quit" | "q" -> print_string rouge "\nSee you !\n"; exit 0
                  | "help" | "h" -> begin
                                         clean () ;
                                         help () ;
@@ -758,8 +777,10 @@ let rec loop (etat: etat) (sorting) : etat =
                                    end
                  | _ -> loop etat sorting
         end ;; 
+
+(* Random seed, good luck *)
        
-Random.self_init () ;; (* random seed *)
+let () = Random.self_init () ;; 
 
 let () = welcome () ;;
 
@@ -767,4 +788,4 @@ let etat = init_partie () ;;
 
 let etat = loop etat en_ordre ;; 
 
-
+let () = gagnant etat ;;

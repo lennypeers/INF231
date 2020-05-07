@@ -1,8 +1,65 @@
-(*  main program *)
+(* Functions used in the terminal game 
+ *
+ * Depends on ANSITerminal 
+ *
+ * *)
+
+open ANSITerminal ;;
+
+(* somme shortcut for colors *)
+
+let bleu : style list = [Foreground(Blue)] and
+    rouge : style list = [Foreground(Red)] and 
+    jaune : style list = [Foreground(Yellow)] and
+    noir : style list = [Foreground(White) ; Background(Black)] and
+    joker : style list= [Foreground(Cyan)] and
+    normal : style list = [] ;;
+
+(* tuile2string: tuile -> string * style list 
+ * need to print the tiles 
+ *)
+
+let tuile2string = function | Joker -> " [J] ",joker
+                            | T(n,Bleu) -> " [" ^ string_of_int(n) ^ "] ",bleu
+                            | T(n,Jaune) -> " [" ^ string_of_int(n) ^ "] ",jaune
+                            | T(n,Noir) -> " [" ^ string_of_int(n) ^ "] ",noir
+                            | T(n,Rouge) -> " [" ^ string_of_int(n) ^ "] ",rouge ;;
+
+(* functions that print combinations, tables, hands... *)
+
+let print_tuile (tuile: tuile) : unit =
+    let str,style = tuile2string tuile in
+    print_string (style) (str) ;;
+
+let print_mens (set: tuile multiensemble) : unit =
+    (* conversion from mens to tuile list *)
+    let set = List.fold_left (fun acc (x,n) -> match n with 
+                                            | 1 -> acc @ [x]
+                                            | _ -> acc @ [x;x] ) [] set
+    in List.fold_left (fun acc x -> print_tuile x ; acc) () set;
+     print_string normal "\n";;
+
+let print_comb (comb: combinaison) : unit =
+    List.fold_left (fun acc x -> print_tuile x ; acc) () comb ;
+    print_string normal "\n" ;;
+
+let print_table (table: table) : unit =
+    List.fold_left (fun acc x -> print_comb x ; print_string normal "\n"; acc) () table ;
+    print_string normal "\n" ;;
+
+(* clear the terminal, setting the cursors on the top left corner *)
 
 let clean () : unit =
     set_cursor 1 1;
     erase Below ;;
+
+(* continue function : waits for a key *)
+
+let continue () : unit =
+    print_string rouge "\nHit enter to play!\n" ;
+    let _ = read_line () in () ;;
+
+(* help dialog *)
 
 let help () : unit = 
     print_string normal "- To enter a tile, type the number, followed by the first letter (lower or uppercase) of its color\n" ;
@@ -12,17 +69,19 @@ let help () : unit =
     print_string normal "    or also    " ;
     print_string [Foreground(Green)] "1b 1j 1n 1r j\n" ;
     print_string normal "- To enter a table or a pose, type the combinations, line by line.\n" ;
-    print_string normal "- To quit the game, type q\n\n\n" ;
-    print_string [Foreground(Red)] "Hit enter to play!\n" ;
-    let _ = read_line () 
-    in () ;
+    print_string normal "- To quit the game, type q\n\n" ;
+    continue () ;
 ;;
+
+(* greetings *)
 
 let welcome () : unit = 
     clean () ;
     print_string [cyan] "A terminal based Rummikub\n" ;
     print_string [cyan] "Powered by ANSITerminal\n\n" ;
     help () ;;
+
+(* converting a string to a tile, needed to read inputs on the keyboard *)
 
 let string2tuile (inp: string) : tuile =
         match inp with
@@ -85,7 +144,6 @@ let lire_combinaison () : combinaison =
     let inp = String.split_on_char ' ' (read_line()) 
     in List.fold_right (fun x acc -> try (string2tuile x) :: acc with _ -> acc ) inp [] ;;
 
-
 let lire_table () : table = 
     let rec readint () : int =
         print_string normal "How many combination do you want to put?\n";
@@ -104,29 +162,34 @@ let rec read_single_tile () : tuile =
     try string2tuile inp
     with _ -> read_single_tile () ;;
 
+(* missing function: checks if a player already played *)
+
 let est_premier_coup (etat: etat) : bool =
     let _,ret,_ = le_statut (joueur_courant etat) etat in
     not ret ;;
 
+(* printing all the possible actions *)
+
 let ask (joueur: joueur) : unit =
-        print_string [red] (if (joueur = J1) then "\nJ1:   " else "\nJ2:   ");
-        print_string [red] "d" ;
+        print_string rouge (if (joueur = J1) then "\nJ1:   " else "\nJ2:   ");
+        print_string rouge "d" ;
         print_string normal "raw / " ;
-        print_string [red] "r" ;
+        print_string rouge "r" ;
         print_string normal "eorganize / add a ";
-        print_string [red] "c" ;
+        print_string rouge "c" ;
         print_string normal "ombination or a " ;
-        print_string [red] "t" ;
+        print_string rouge "t" ;
         print_string normal "ile / " ;
-        print_string [red] "q" ;
+        print_string rouge "q" ;
         print_string normal "uit / " ;
-        print_string [red] "s" ;
+        print_string rouge "s" ;
         print_string normal "ort / h" ;
-        print_string [red] "i" ;
+        print_string rouge "i" ;
         print_string normal "nt / " ;
-        print_string [red] "h" ;
+        print_string rouge "h" ;
         print_string normal  "elp ?\n" ;;
 
+(* function to get a group view *)
 
 let en_ordre_groupe (ens: tuile multiensemble) : tuile multiensemble =
   let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
@@ -142,6 +205,8 @@ let en_ordre_groupe (ens: tuile multiensemble) : tuile multiensemble =
                          | head::tail -> insertion head (tri tail)  
   in tri ens ;;
 
+(* function that gives the possible valid combinations *)
+
 let hint (etat: etat) : unit =
     print_string normal "\nExisting combination: ";
     (let proposition = extraction_suite (la_main (joueur_courant etat) etat) in
@@ -151,10 +216,32 @@ let hint (etat: etat) : unit =
         if proposition <> []
         then print_comb proposition
         else print_string rouge "nothing found\n") ;
-    print_string rouge "\nHit enter to continue\n";
-    let _ = read_line () in () ;;
+   continue () ;;
 
+(* calculate the score *)
 
+let score (main: main) : int = 
+    List.fold_left (fun acc -> function | Joker,occ -> acc + 30 * occ 
+                                        | T(value,_),occ -> acc + value * occ ) 0 main ;;
+
+let gagnant (etat: etat) : unit =
+    clean ();
+    let score1 = score (la_main J1 etat) and score2 = score (la_main J2 etat) in
+        if score1 = score2 
+        then print_string rouge "\n\n\n\nWhat a tight game ! The match ended in a draw !"
+        else
+            begin
+                print_string normal "\n\nThe winner is ";
+                print_string rouge (if score1 < score2 then "J1" else "J2");
+                print_string normal " with a final score of ";
+                print_string rouge (string_of_int (min score1 score2));
+                print_string normal "\nfollowed by ";
+                print_string rouge (if score1 < score2 then "J2" else "J1");
+                print_string normal " with a final score of ";
+                print_string rouge (string_of_int (max score1 score2) ^ "\n\n\n"); 
+            end ;;
+
+(* main loop, finally c: *)
 
 let rec loop (etat: etat) (sorting) : etat =
     if (la_pioche etat = [] || (la_main J1 etat = []) || (la_main J2 etat = []))
@@ -177,7 +264,7 @@ let rec loop (etat: etat) (sorting) : etat =
                  | "c" -> if (est_premier_coup etat)
                           then loop (jouer_1er_coup etat (lire_table())) sorting
                           else loop (jouer_1_coup etat (la_table etat @ lire_table ())) sorting
-                 | "quit" | "q" -> print_string [red] "\nSee you !\n"; exit 0
+                 | "quit" | "q" -> print_string rouge "\nSee you !\n"; exit 0
                  | "help" | "h" -> begin
                                         clean () ;
                                         help () ;
@@ -194,8 +281,10 @@ let rec loop (etat: etat) (sorting) : etat =
                                    end
                  | _ -> loop etat sorting
         end ;; 
+
+(* Random seed, good luck *)
        
-Random.self_init () ;; (* random seed *)
+let () = Random.self_init () ;; 
 
 let () = welcome () ;;
 
@@ -203,4 +292,4 @@ let etat = init_partie () ;;
 
 let etat = loop etat en_ordre ;; 
 
-
+let () = gagnant etat ;;

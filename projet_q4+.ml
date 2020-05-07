@@ -8,7 +8,7 @@ type couleur =
     | Jaune 
     | Noir ;;
 
-type valeur = int (* restreint à l'intervalle [1,13] *) ;;
+type valeur = int (* interval [1,13] *) ;;
 
 type tuile = 
     | Joker 
@@ -17,9 +17,7 @@ type tuile =
 
 (* Q5 *)
 
-type combinaison = tuile list ;; (* avec l'ordre des tuiles dans un ordre 
-                                    croissant et de même couleur ou constant
-                                    avec des couleurs différentes. *)
+type combinaison = tuile list ;; 
 
 type table = combinaison list ;;
 
@@ -51,6 +49,20 @@ let cst_PIOCHE_INIT : pioche =
 
 
 (* Q7 *)
+
+(*
+ * algorithm: insertion sort
+ *
+ * comp_ordre: - tuile multielement -> tuile multielement -> bool
+ *             - (comp_ordre a b) is true if a <= b in lexicographic order.
+ *
+ * insertion: - tuile multielement -> tuile multiensemble -> tuile multiensemble
+ *            - (insertion a l) is the list l with a inserted.
+ *
+ * tri: - tuile multiensemble -> tuile multiensemble
+ *      - tri (ens) is the list ens sorted in lexicographic order
+ *
+ *)
 
 let en_ordre (ens: tuile multiensemble) : tuile multiensemble =
     let comp_ordre (a,_: tuile multielement) (b,_: tuile multielement) : bool =
@@ -91,14 +103,14 @@ let extraire (n:int) (p:pioche) : main * pioche =
 
 
 let distrib () : main * main * pioche =
-  let (main1,pioche1) = extraire 14 cst_PIOCHE_INIT in 
-  let (main2,pioche2)= extraire 14 pioche1 in 
-  (main1,main2,pioche2) ;;
+    let (main1,pioche1) = extraire 14 cst_PIOCHE_INIT in 
+    let (main2,pioche2)= extraire 14 pioche1 in 
+    (main1,main2,pioche2) ;;
 
 
 let init_partie () : etat =
-  let (main1,main2,pioche) = distrib () in
-  (((J1,false,main1),(J2,false,main2)),[],pioche,J1) ;;
+    let (main1,main2,pioche) = distrib () in
+    (((J1,false,main1),(J2,false,main2)),[],pioche,J1) ;;
 
 
 (* 6.5.2 Accès aux informations d'un état *)
@@ -199,6 +211,8 @@ let points_groupe (comb: combinaison) : int =
     let len,_,valeur,_,_ = List.fold_left f_groupe (0, [], 0, true, true) comb in
     valeur * len ;;
 
+(* points_pose returns the maximal points if the combination is both group and sequence *)
+
 let points_pose (pose : pose) : int =
     let f_pose = fun (acc : int) (x : combinaison) ->
         acc + (
@@ -211,6 +225,8 @@ let points_pose (pose : pose) : int =
     List.fold_left f_pose 0 pose ;;
 
 (* Q12 : tableVmens *)
+
+(* List.flatten: 'a list list -> 'a list *)
 
 let tableVmens (table: table) : tuile multiensemble =
     en_ordre (List.fold_left (fun acc x -> ajoute (x,1) acc) [] (List.flatten table) );;
@@ -227,6 +243,13 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
     (diff_main <> []) && (inclus t0 t1) && (difference t1 t0 =  diff_main) ;;
 
 (* Q14 *)
+
+(* Algorithm used: 
+ *
+ * For all the combinaisons of the table:
+ * - Adding the tile to the head or head of the combination if it is possible
+ * - if not, slicing into the combination and replacing the eventuals jokers by the tile.
+ *)
 
 let ajouter_tuile (tuile: tuile) (table: table) : table =
 
@@ -273,8 +296,18 @@ let ajouter_tuile (tuile: tuile) (table: table) : table =
 
 (* 
  * Algorithm n2 : testing all the possible cases.
- * In this algorithmn, we focus on the combinations of 3 tuiles.
- *)
+ *
+ * In this algorithm, we focus on the combinations of 3 tuiles.
+ *
+ * Algorithm used: - conversion of the table to a tuile list while 
+ *                   removing duplicates (since they are useless)
+ *                   and jokers. (the number of joker removed is stored)
+ *                 - sorting the tuile list. The sorting algorithm depend on 
+ *                   the final combination.
+ *                 - slicing into the sorted list, without joker, with one eventual 
+ *                   joker, with two eventuals jokers.
+ *)         
+
 
 (* permutation_test: function that checks if the permutation of a 
  *                   tupple of three tuiles can verify a predicate *) 
@@ -383,6 +416,117 @@ let jouer_1er_coup (etat: etat) (pose: pose) : etat =
                 then etat
                 else ((j1, b1, m1),(j2, true, new_main)), new_table, pioche, J1 ;;
 
-    
+(* 
+ *
+ *
+ * ASSERTS 
+ *
+ *
+ * *)    
+
+(* extraire *)
+
+assert ( let main,pioche = extraire 14 cst_PIOCHE_INIT in 
+         (cardinal main = 14) && (cardinal pioche = 106 - 14) &&
+         (difference cst_PIOCHE_INIT pioche = main) ) ;;
+
+
+(* distrib *)
+
+assert ( let m1,m2,pioche = distrib () in 
+         (cardinal m1 = cardinal m2 ) && (cardinal pioche = 106 - 14 * 2)
+         && (cardinal m1 = 14) ) ;;
+
+
+(* est_suite *)
+
+assert ( (est_suite [T(1,Bleu) ; T(2,Bleu) ; T(3,Bleu)]) &&
+         (est_suite [T(5,Noir) ; T(6,Noir) ; T(7,Noir) ; T(8,Noir)]) &&
+         (est_suite [Joker ; Joker ; T(13,Bleu)]) &&
+         (est_suite [Joker ; T(12,Bleu) ; Joker]) &&
+         (est_suite [T(11,Bleu) ; Joker ; Joker]) &&
+         (est_suite [Joker ; T(13,Bleu) ; Joker] = false) &&
+         (est_suite [Joker ; T(1,Jaune) ; Joker] = false) &&
+         (est_suite [T(1,Jaune) ; Joker ; T(2,Jaune)] = false) &&
+         (est_suite [T(-1,Jaune) ; Joker ; T(1,Jaune)] = false) ) ;;
+         
+
+(* est_groupe *)
+
+assert ( (est_groupe [T(1,Bleu) ; T(1,Noir) ; T(1,Rouge) ; T(1,Jaune)]) &&
+         (est_groupe [T(4,Bleu) ; T(4,Noir) ; T(4,Rouge)]) &&
+         (est_groupe [Joker ; T(4,Noir) ; T(4,Rouge) ; Joker]) &&
+         (est_groupe [T(4,Bleu) ; Joker ; Joker ; T(4,Rouge)]) &&
+         (est_groupe [T(4,Bleu) ; Joker ; T(4,Rouge) ; Joker]) &&
+         (est_groupe [Joker ; Joker ; T(5,Rouge)]) &&
+         (est_groupe [T(1,Bleu) ; T(1,Noir) ; T(1,Rouge) ; T(1,Jaune) ; Joker] = false) &&
+         (est_groupe [T(4,Bleu) ; T(4,Rouge) ; T(4,Bleu)] = false) && 
+         (est_groupe [T(4,Bleu) ; Joker ; T(4,Bleu)] = false) && 
+         (est_groupe [Joker ; T(4,Bleu)] = false) ) ;;
+
+
+(* combinaison_valide *)
+
+assert ( (combinaison_valide [T(1,Bleu) ; T(1,Noir) ; T(1,Rouge) ; T(1,Jaune)]) &&
+         (combinaison_valide [T(1,Bleu) ; T(2,Bleu) ; T(3,Bleu)]) ) ;;
+
+
+(* combinaisons_valides *)
+
+assert ( (combinaisons_valides [[Joker ; Joker ; T(13,Jaune)] ; 
+                                 [T(12,Bleu) ; T(12,Noir) ; T(12,Jaune)] ;
+                                 [ T(2,Rouge) ; Joker ; Joker ]]) &&
+         (combinaisons_valides [] = false) &&
+         (combinaisons_valides [[Joker ; T(1,Jaune)]] = false) &&
+         (combinaisons_valides [[Joker ; T(11,Noir) ; T(13,Noir)]] = false) );; 
+
+
+(* points_suite, points_groupe *)
+
+assert ( 
+
+(points_groupe [T(12,Bleu) ; T(12,Rouge) ; T(12,Jaune) ; T(12,Noir)] = 12 * 4) &&
+(points_groupe [T(11,Bleu) ; T(11,Rouge) ; T(11,Jaune) ; T(11,Noir)] = 11 * 4) &&
+(points_groupe [T(10,Bleu) ; T(10,Rouge) ; T(10,Jaune)] = 10 * 3) &&
+(points_groupe [T(5,Bleu) ; T(5,Rouge) ; T(5,Noir)] = 5 * 3) &&
+(points_groupe [Joker ; T(10,Noir) ; Joker] = 10 * 3) &&
+(points_groupe [Joker ; Joker ; T(13,Jaune)] = 13 * 3) &&
+(points_groupe [T(1,Bleu) ; Joker ; Joker] = 1 * 3) &&
+
+(points_suite [T(10,Rouge) ; T(11,Rouge) ; T(12,Rouge) ; T(13,Rouge)] = 10 + 11 + 12 + 13) &&
+(points_suite [T(9,Jaune) ; T(10,Jaune) ; T(11,Jaune) ; T(12,Jaune)] = 9 + 10 + 11 + 12) &&
+(points_suite [T(8,Bleu) ; T(9,Bleu) ; T(10,Bleu)] = 8 + 9 + 10) &&
+(points_suite [T(7,Noir) ; T(8,Noir) ; T(9,Noir)] = 7 + 8 + 9) &&
+(points_suite [T(10,Rouge) ; Joker ; T(12,Rouge) ; T(13,Rouge)] = 10 + 11 + 12 + 13) &&
+(points_suite [T(9,Jaune) ; T(10,Jaune) ; Joker ; T(12,Jaune)] = 9 + 10 + 11 +12) &&
+(points_suite [Joker ; Joker ; T(10,Bleu)] = 8 + 9 + 10) ) ;;
+
+
+(* extraction_groupe, extraction_suite *)
+
+assert ( (let main = [(T (1, Bleu), 2); (T (3, Bleu), 1); (T (8, Bleu), 1);
+   (T (3, Rouge), 1); (T (8, Rouge), 1); (T (9, Rouge), 1);
+   (T (10, Rouge), 1); (T (13, Rouge), 1); (T (1, Jaune), 1);
+   (T (8, Jaune), 1); (T (9, Jaune), 1); (T (1, Noir), 1);
+   (Joker, 1)] in extraction_groupe main = [T (1, Noir); T (1, Jaune); T (1, Bleu)] 
+   && extraction_suite main = [T (8, Rouge); T (9, Rouge); T (10, Rouge)] ) &&
+
+        (let main,_ = extraire 14 cst_PIOCHE_INIT in let combi = extraction_suite main in
+         if combi <> [] then est_suite combi else true) &&
+
+        (let main,_ = extraire 14 cst_PIOCHE_INIT in let combi = extraction_groupe main in
+         if combi <> [] then est_groupe combi else true) &&
+
+        (let combi = extraction_groupe cst_PIOCHE_INIT in combinaison_valide combi) &&
+        (let combi = extraction_suite cst_PIOCHE_INIT in combinaison_valide combi) ) ;;
+            
+
+(* ajouter_tuile *)
+
+assert ( combinaisons_valides (ajouter_tuile Joker [[T(1,Jaune) ; T(2,Jaune) ; T(3,Jaune)]] ) &&
+         combinaisons_valides (ajouter_tuile Joker [[T(11,Jaune) ; T(12,Jaune) ; T(13,Jaune)]]) &&
+         combinaisons_valides (ajouter_tuile (T(12,Jaune)) [[T(11,Jaune) ; Joker ; T(13,Jaune)]]) &&
+         combinaisons_valides (ajouter_tuile (T(11,Jaune)) [[Joker ; T(12,Jaune) ; T(13,Jaune)]]) &&
+         combinaisons_valides (ajouter_tuile (T(12,Jaune)) [[Joker ; T(12,Jaune) ; T(13,Jaune)]]) = false ) ;;
 
 (* end *)  
