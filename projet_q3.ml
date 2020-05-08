@@ -5,9 +5,6 @@
  * Pedersen Ny Aina
  *)
 
-
-
-
 type nat = int (* >= 0 *) ;;
 
 type 'a multielement = 'a * nat ;;

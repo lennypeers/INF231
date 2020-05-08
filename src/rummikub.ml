@@ -5,9 +5,6 @@
  * Pedersen Ny Aina
  *)
 
-
-
-
 type nat = int (* >= 0 *) ;;
 
 type 'a multielement = 'a * nat ;;
@@ -76,7 +73,6 @@ let un_dans (ens: 'a multiensemble) : 'a =
                                         the error message of the interpretor *)
   in let ( random : int ) = Random.int(cardinal ens)
   in ieme (ens) (random);;
-
 
 (* Q4 *)
 
@@ -325,7 +321,7 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
 (* Algorithm used: 
  *
  * For all the combinaisons of the table:
- * - Adding the tile to the head or head of the combination if it is possible
+ * - Adding the tile to the head or the tail of the combination if it is possible
  * - if not, slicing into the combination and replacing the eventuals jokers by the tile.
  *)
 
@@ -375,7 +371,7 @@ let ajouter_tuile (tuile: tuile) (table: table) : table =
 (* 
  * Algorithm n2 : testing all the possible cases.
  *
- * In this algorithm, we focus on the combinations of 3 tuiles.
+ * In this algorithm, we focus on the combinations of 3 tiles.
  *
  * Algorithm used: - conversion of the table to a tuile list while 
  *                   removing duplicates (since they are useless)
@@ -464,19 +460,16 @@ let piocher (etat: etat) : etat =
         let m2 = en_ordre (ajoute (new_card,1) m2)
         in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J1) ;;
 
-let remove_from_hand (liste: tuile multiensemble) (main: main) =
-    List.fold_right (fun elem x -> supprime elem x) liste main ;;
-
 let jouer_1_coup (etat: etat) (table: table) : etat = 
     let (((j1 ,b1, m1), (j2,b2,m2)), table1, pioche, joueur) = etat in 
     match joueur with 
     | J1 -> let diff = difference (tableVmens table) (tableVmens table1) in
-            let new_main = remove_from_hand diff m1 in 
+            let new_main = difference m1 diff in 
                  if b1 = false || not (coup_ok table1 m1 table new_main) 
                  then etat
                  else ((j1, b1, new_main), (j2, b2, m2)), table, pioche, J2 
     | J2 -> let diff = difference (tableVmens table) (tableVmens table1) in
-            let new_main = remove_from_hand diff m2 in 
+            let new_main = difference m2 diff in 
                  if b2 = false || not (coup_ok table1 m2 table new_main) 
                  then etat
                  else ((j1, b1, m1), (j2, b2, new_main)), table, pioche, J1 ;;
@@ -485,11 +478,11 @@ let jouer_1er_coup (etat: etat) (pose: pose) : etat =
     let (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur) = etat in 
     let new_table = pose @ table in
     match joueur with
-    | J1 -> let new_main = remove_from_hand (tableVmens pose) m1 in
+    | J1 -> let new_main = difference m1 (tableVmens pose) in
                 if b1 = true || not (premier_coup_ok m1 pose new_main)
                 then etat
                 else ((j1, true, new_main),(j2, b2, m2)), new_table, pioche, J2
-    | J2 -> let new_main = remove_from_hand (tableVmens pose) m2 in
+    | J2 -> let new_main = difference m2 (tableVmens pose) in
                 if b2 = true || not (premier_coup_ok m2 pose new_main)
                 then etat
                 else ((j1, b1, m1),(j2, true, new_main)), new_table, pioche, J1 ;;
