@@ -155,7 +155,13 @@ let la_main (joueur:joueur) (etat:etat) : main =
 (* An intermediate function that compares a tuile to the value in the accumulator:
  * the accumulator is a tupple containing the length of the combinaison, the previous value, 
  * the color of the sequence, a bool that says if we already matched a tuile that is not 
- * a Joker and the status of the current sequence (is it a suite or not ?) *)
+ * a Joker and the status of the current sequence (is it a suite or not ?) 
+ *
+ * For instance:
+ * f_suite (0, _, _, true, true) (T(n, couleur)) = (1, n, couleur, false, true) 
+ * f_suite (2, 11, Jaune, false, true) (T(12,Jaune)) = (3, 12, Jaune, false, true)
+ * f_suite (3, 11, Noir, false, true) (T(12,Bleu)) = (_, _, _, false) because Bleu <> Noir
+ * *)
 
 let f_suite (len,valeur,couleur,est_debut,statut : int * valeur * couleur * bool * bool) (tuile : tuile) : int * valeur * couleur * bool * bool = 
     match tuile with
@@ -178,7 +184,12 @@ let est_suite (comb: combinaison) : bool =
  * the accumulator is a tupple containing the length of the combinaison, a list of 
  * previous colors, the previous number, 
  * a bool that says if we already matched a tuile that is not a Joker
- * and the status of the current sequence (is it a groupe or not ?) *)
+ * and the status of the current sequence (is it a groupe or not ?)
+ *
+ * For instance:
+ * f_groupe (4, _, _, _, _) (_) = (_, _, _, _, false) because the lenght is greater than 4
+ * f_groupe (2, [Bleu,1], 12, false, true) (T(12,Bleu)) = (_, _, _, _, false) because we have two blue tiles
+ * *)
 
 let f_groupe (len,coul_list,num,est_debut,statut : int * couleur multiensemble * valeur * bool * bool) (tuile : tuile) : int * couleur multiensemble * valeur * bool * bool =
     match tuile with 
@@ -203,6 +214,11 @@ let combinaisons_valides (comb_list: combinaison list) : bool =
 
 (* Q11 : Calcul des points *)
 
+(* formula of the sum of the values of an arithmetic sequence: 
+    * (first_value + last_value) * len_seq / 2
+    * <=> len_seq * ( 2 * last_value - len_seq + 1) / 2
+    *)
+
 let points_suite (comb : combinaison) : int =
     let len,valeur,_,_,_ = List.fold_left f_suite (0, 0, Noir, true, true) comb 
     in len * ( 2 * valeur - len + 1 ) / 2 ;;
@@ -211,7 +227,12 @@ let points_groupe (comb: combinaison) : int =
     let len,_,valeur,_,_ = List.fold_left f_groupe (0, [], 0, true, true) comb in
     valeur * len ;;
 
-(* points_pose returns the maximal points if the combination is both group and sequence *)
+(* points_pose returns the maximal points if the combination is both group and sequence 
+ *
+ * For instance:
+     * points_pose [[Joker ; Joker ; T(10,Bleu)]] = 30 since the only 
+     * combination is both group and sequence and since 8 + 9 + 10 < 10 * 3
+ * *)
 
 let points_pose (pose : pose) : int =
     let f_pose = fun (acc : int) (x : combinaison) ->
@@ -249,6 +270,10 @@ let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
  * For all the combinaisons of the table:
  * - Adding the tile to the head or the tail of the combination if it is possible
  * - if not, slicing into the combination and replacing the eventuals jokers by the tile.
+ *
+ * With this algorithm we can replace a Joker:
+     * ajouter_tuile (T(12,Noir)) [[T(11,Noir) ; Joker ; T(13,Noir)]] 
+     *              = [[Joker ; T(11,Noir) ; T(12,Noir) ; T(13,Noir)]]
  *)
 
 let ajouter_tuile (tuile: tuile) (table: table) : table =
@@ -372,19 +397,19 @@ let extraction_groupe = comparator (fun x y -> match x,y with
 (* Q16 *)
 
 let piocher (etat: etat) : etat =
-  let (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur) = etat in 
-  if pioche = [] 
-  then etat
-  else 
-    let new_card = un_dans pioche in 
-    let pioche = supprime (new_card,1) pioche in
-    match joueur with
-    | J1 ->
-        let m1 = en_ordre (ajoute (new_card,1) m1)         
-        in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J2)
-    | J2->
-        let m2 = en_ordre (ajoute (new_card,1) m2)
-        in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J1) ;;
+    if la_pioche etat = [] 
+    then etat
+    else 
+        let (((j1 ,b1, m1), (j2,b2,m2)), table, pioche, joueur) = etat in 
+        let new_card = un_dans pioche in 
+        let pioche = supprime (new_card,1) pioche in
+        match joueur with
+        | J1 ->
+            let m1 = en_ordre (ajoute (new_card,1) m1)         
+            in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J2)
+        | J2->
+            let m2 = en_ordre (ajoute (new_card,1) m2)
+            in (((j1,b1,m1), (j2,b2,m2)), table, pioche, J1) ;;
 
 let jouer_1_coup (etat: etat) (table: table) : etat = 
     let (((j1 ,b1, m1), (j2,b2,m2)), table1, pioche, joueur) = etat in 
