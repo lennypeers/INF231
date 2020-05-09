@@ -258,6 +258,15 @@ let tableVmens (table: table) : tuile multiensemble =
 let premier_coup_ok (m0: main) (p :pose) (m1: main) : bool =
     (combinaisons_valides p) && (difference m0 m1 = tableVmens p) && (points_pose p >= 30) ;;
 
+
+
+
+
+(*  Conditions for a coup (not the first one) 
+- t1 is valide
+- m0 <> m1 
+- t0 includes t1
+- difference t1 t0 = difference  m0 m1  *)
 let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
     (combinaisons_valides t1) && 
     let diff_main = difference m0 m1 and t1 = tableVmens t1 and t0 = tableVmens t0 in
