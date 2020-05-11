@@ -18,7 +18,7 @@ make test
 - If not, install it with your package manager:
 
 ```bash
-opam install dune # better way do to it
+opam install dune # best way do to it
 apt install dune # in debian
 brew install dune # macos
 
