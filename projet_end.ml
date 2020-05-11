@@ -255,8 +255,22 @@ let tableVmens (table: table) : tuile multiensemble =
 
 (* Q13 *)
 
+(* Conditions for the first coup:
+- combinaisons in p are valide
+- difference m0 m1 = tuile ensemble of p
+- point of the pose is >= 30 *)
 let premier_coup_ok (m0: main) (p :pose) (m1: main) : bool =
     (combinaisons_valides p) && (difference m0 m1 = tableVmens p) && (points_pose p >= 30) ;;
+
+
+
+
+
+(* Conditions for a coup (not the first one):
+- combinaisons in t1 are valide
+- m0 <> m1 
+- t0 includes t1
+- difference t1 t0 = difference  m0 m1 *)
 
 let coup_ok (t0: table) (m0: main) (t1: table) (m1: main) : bool =
     (combinaisons_valides t1) && 
