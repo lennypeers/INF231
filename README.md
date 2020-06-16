@@ -2,7 +2,7 @@
 
 A terminal based Rummikub that uses the Library [ANSITerminal](https://github.com/Chris00/ANSITerminal).
 
-## Preriquisities
+## Preriquisites
 
 - Dune >= 2.5
 - Ocaml
